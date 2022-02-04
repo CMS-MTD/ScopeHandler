@@ -1,0 +1,9 @@
+Threshold, end threshold, ToT threshold, n_consec samples, n_consec_end samples
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
+10, 8, 10, 4, 4
