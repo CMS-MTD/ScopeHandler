@@ -9,7 +9,11 @@ from collections import namedtuple
 hitTreeInputDir ="/home/daq/SurvivalBeam2021/LecroyScope/RecoData/HitCounterRECO/RecoWithoutTracks/";
 infoInputDir = "/home/daq/SurvivalBeam2021/ConfigInfo/Runs/"
 
-condorMode=False
+condorMode=True
+if condorMode: 
+    hitTreeInputDir=""
+    infoInputDir=""
+
 
 def processRun(runNumber,outfileName,infoDict):
     # globConf,scopeConf,caenConf = getConfs(runNumber)
@@ -137,12 +141,16 @@ if __name__ == '__main__':
 
     infileName = "%s/v%i/hitTree_run%i.root" % (hitTreeInputDir,versionNumber,runNumber)
     outfileName = "%s/v%i/hitTree_run%i_info.root" % (hitTreeInputDir,versionNumber,runNumber)
-    
+    if condorMode:
+        infileName="hitTree_run%i.root"%runNumber
+        outfileName="hitTree_run%i_info.root"%runNumber
+
+
     cmd = "xrdcp -f %s %s" % (infileName,outfileName)
     print cmd
     os.system(cmd)
 
-    infoDictFileName = "%s/info_%i.json" % (infoInputDir,runNumber)
+    infoDictFileName = "%sinfo_%i.json" % (infoInputDir,runNumber)
     infoDictFile = open(infoDictFileName,"r")
     txtbuffer = infoDictFile.read()
 

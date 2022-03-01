@@ -1,0 +1,2 @@
+xrdcp -f makeHitTree  root://cmseos.fnal.gov//store/group/cmstestbeam/SurvivalBeam2021/condor/
+xrdcp -r configs makeHitTree root://cmseos.fnal.gov//store/group/cmstestbeam/SurvivalBeam2021/condor/Configs

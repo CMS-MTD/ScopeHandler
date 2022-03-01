@@ -22,7 +22,7 @@ using namespace std;
 
 const unsigned int NUM_CHANNELS = 8;
 const unsigned int NUM_TIMES = 1;
-const unsigned int NUM_SAMPLES = 50000002;
+const unsigned int NUM_SAMPLES = 25000002;
 
 // To do
 // Noise calculation
@@ -81,11 +81,11 @@ float* timeoffsets = new float[NUM_CHANNELS];
 double* AUX_time = new double[NUM_TIMES*NUM_SAMPLES];
 float* AUX_channel = new float[NUM_CHANNELS*NUM_SAMPLES];
 
-float channel_polarity[8] = {-1,-1,-1,1,
+float channel_polarity[8] = {-1,-1,-1,-1,
 							-1,-1,-1,-1}; 
 
 ///// Hit defining parameters   /////
-float tot_thres[8];//=10; //mV. Threshold for measuring ToT
+float tot_thres[8]= {10,10,10,10,10,10,10,10};//=10; //mV. Threshold for measuring ToT
 
 float threshold[8] = {10,10,10,10,10,10,10,10};// = 10; //mV. Threshold for detecting a new hit
 float endthreshold[8]={10,10,10,10,10,10,10,10};;//= 8; //mV. Threshold for defining end of a hit

@@ -18,6 +18,7 @@ RawDataPath = ""
 RawDataLocalCopyPath = ""
 #OutputFilePath = "/home/daq/ScopeData/LecroyConverted/"
 OutputFilePath = "/home/daq/SurvivalBeam2021/LecroyScope/RecoData/ConversionRECO/"
+eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/SurvivalBeam2021/LecroyScope/RecoData/ConversionRECO/"
 
 LocalMode=True
 CopyToEOS=True
@@ -31,6 +32,8 @@ if LocalMode:
 	RawDataLocalCopyPath = "/home/daq/SurvivalBeam2021/LecroyScope/RawData/"
 
 	# RawDataLocalCopyPath = "/home/daq/ScopeData/LecroyRaw/"
+if not LocalMode:
+	OutputFilePath = ""
 
 #### Memory addresses #####
 WAVEDESC=11
@@ -262,6 +265,11 @@ def get_vertical_array(filepath_in,full_offset,points_per_frame,vertical_gain,ve
 	y_axis = [vertical_gain*y - vertical_offset for y in y_axis_raw]
 
 	my_file.close()
+	del binary_y_data
+	del y_axis_raw
+	del starting_position
+	del my_file
+
 	return y_axis,horizontal_offset
 
 
@@ -393,5 +401,5 @@ final = time.time()
 print "\nFilling tree took %i seconds." %(final-start)
 print "\nFull script duration: %0.f s"%(final-initial)
 
-
+if CopyToEOS: os.system("xrdcp -fs %s %s" %(outputFile,eosPath))
 # dump_info(inputFile,1,1000)
