@@ -16,7 +16,6 @@ initial = time.time()
 
 RawDataPath = ""
 RawDataLocalCopyPath = ""
-#OutputFilePath = "/home/daq/SurvivalBeam2021/LecroyScope/RecoData/ConversionRECO/"
 OutputFilePath = "/home/daq/ScopeData/LecroyConverted/"
 
 LocalMode=True
@@ -28,7 +27,6 @@ if os.path.exists("_condor_stdout"):
 
 if LocalMode:
 	RawDataPath = "/home/daq/LecroyMount/"
-	#RawDataLocalCopyPath = "/home/daq/SurvivalBeam2021/LecroyScope/RawData/"
 	RawDataLocalCopyPath = "/home/daq/ScopeData/LecroyRaw/"
 
 #### Memory addresses #####
