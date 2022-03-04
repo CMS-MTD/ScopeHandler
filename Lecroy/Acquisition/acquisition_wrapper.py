@@ -7,7 +7,7 @@ horizontalWindow = 200 #ns
 
 #Hard Code these:
 trigCh="C8" ## or "C{N}" or "EX"
-trig= 0.01 ## -0.01 V
+trig= 0.001 ## -0.01 V
 
 vScale1 = 0.03
 vScale2 = 0.03 
@@ -27,7 +27,7 @@ timeoffset = 0 #ns
 runNumber = -1 ### -1 means use serial number
 
 
-ScopeControlDir = "/home/daq/LecroyControl/"
+ScopeControlDir = "/home/daq/SensorBeam2022/ScopeHandler/Lecroy/"
 
 def ScopeAcquisition(numEvents):
 
