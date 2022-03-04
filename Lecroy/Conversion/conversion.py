@@ -16,7 +16,8 @@ initial = time.time()
 
 RawDataPath = ""
 RawDataLocalCopyPath = ""
-OutputFilePath = "/home/daq/ScopeData/LecroyConverted/"
+OutputFilePath = "/home/daq/SensorBeam2022/LecroyScope/RecoData/ConversionRECO/"
+eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/SensorBeam2022/LecroyScope/RecoData/ConversionRECO/"
 
 LocalMode=True
 CopyToEOS=True
@@ -27,8 +28,10 @@ if os.path.exists("_condor_stdout"):
 
 if LocalMode:
 	RawDataPath = "/home/daq/LecroyMount/"
-	RawDataLocalCopyPath = "/home/daq/ScopeData/LecroyRaw/"
+	RawDataLocalCopyPath = "/home/daq/SensorBeam2022/LecroyScope/RawData/"
 
+if not LocalMode:
+        OutputFilePath = ""
 #### Memory addresses #####
 WAVEDESC=11
 aTEMPLATE_NAME		= WAVEDESC+ 16;
@@ -284,6 +287,7 @@ end = time.time()
 print "\nCopying files locally took %i seconds." % (end-start)
 
 outputFile = "%sconverted_run%i.root"%(OutputFilePath, runNumber)
+#outputFile = "%srun_scope%i.root"%(OutputFilePath, runNumber)
 
 #inputFile = "%s/C1--Trace%i.trc" %(RawDataPath,runNumber)  ### use ch1 to get information
 ##### Get necessary information about format
@@ -380,5 +384,5 @@ final = time.time()
 print "\nFilling tree took %i seconds." %(final-start)
 print "\nFull script duration: %0.f s"%(final-initial)
 
-
+if CopyToEOS: os.system("xrdcp -fs %s %s" %(outputFile,eosPath))
 # dump_info(inputFile,1,1000)
