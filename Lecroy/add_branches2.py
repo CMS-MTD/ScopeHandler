@@ -9,11 +9,13 @@ from collections import namedtuple
 hitTreeInputDir ="/home/daq/SurvivalBeam2021/LecroyScope/RecoData/HitCounterRECO/RecoWithoutTracks/";
 infoInputDir = "/home/daq/SurvivalBeam2021/ConfigInfo/Runs/"
 
-condorMode=True
-if condorMode: 
+
+condorMode=False
+if os.path.exists("_condor_stdout"):
+    print "Detected condor"
+    condorMode=True
     hitTreeInputDir=""
     infoInputDir=""
-
 
 def processRun(runNumber,outfileName,infoDict):
     # globConf,scopeConf,caenConf = getConfs(runNumber)
@@ -24,7 +26,7 @@ def processRun(runNumber,outfileName,infoDict):
     rootfile = TFile(outfileName, "UPDATE")
     if (rootfile.IsZombie() or not rootfile.IsOpen()):
         return 'ERROR: Could not recover TTree, please check file:', outfileName
-    hits = rootfile.Get('hits')
+    hits = rootfile.Get('pulse')
 
     arr_run = array('i',[infoDict['Run number']])
     arr_gconf = array('i',[infoDict['Configuration']])
@@ -138,13 +140,13 @@ if __name__ == '__main__':
     
     runNumber = int(sys.argv[1])
     versionNumber = int(sys.argv[2])
+    inputFileName = str(sys.argv[3])
 
     infileName = "%s/v%i/hitTree_run%i.root" % (hitTreeInputDir,versionNumber,runNumber)
     outfileName = "%s/v%i/hitTree_run%i_info.root" % (hitTreeInputDir,versionNumber,runNumber)
     if condorMode:
-        infileName="hitTree_run%i.root"%runNumber
-        outfileName="hitTree_run%i_info.root"%runNumber
-
+        infileName=inputFileName
+        outfileName=infileName.replace(".root","_info.root")
 
     cmd = "xrdcp -f %s %s" % (infileName,outfileName)
     print cmd
