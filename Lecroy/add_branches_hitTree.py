@@ -26,7 +26,7 @@ def processRun(runNumber,outfileName,infoDict):
     rootfile = TFile(outfileName, "UPDATE")
     if (rootfile.IsZombie() or not rootfile.IsOpen()):
         return 'ERROR: Could not recover TTree, please check file:', outfileName
-    hits = rootfile.Get('pulse')
+    hits = rootfile.Get('hits')
 
     arr_run = array('i',[infoDict['Run number']])
     arr_gconf = array('i',[infoDict['Configuration']])
