@@ -6,8 +6,8 @@ sampleRate = 10#GSa/s ### not sure if works for Lecroy
 horizontalWindow = 200 #ns
 
 #Hard Code these:
-trigCh="C8" ## or "C{N}" or "EX"
-trig= 0.001 ## -0.01 V
+trigCh="EX" ## or "C{N}" or "EX"
+trig= 0.45 ## -0.01 V
 
 vScale1 = 0.03
 vScale2 = 0.03 
@@ -22,7 +22,7 @@ vPos7 = -3
 vPos8 = -3
 
 trigSlope = "POS"
-timeoffset = 0 #ns
+timeoffset = -100 #ns
 
 runNumber = -1 ### -1 means use serial number
 
