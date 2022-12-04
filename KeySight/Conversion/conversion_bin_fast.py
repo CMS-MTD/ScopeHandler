@@ -13,22 +13,22 @@ parser.add_argument('--Run',metavar='Run', type=str, help='Run Number to process
 args = parser.parse_args()
 run = args.Run
 RawDataPath = '/uscms/home/rheller/nobackup/2020_02_CMSTiming/KeySightScope/RawData/'
-RawDataLocalCopyPath = '' #'/uscms/home/rheller/nobackup/2020_02_CMSTiming/KeySightScope/RawData/'
-OutputFilePath = ''#'/uscms/home/rheller/nobackup/2020_02_CMSTiming/KeySightScope/RecoData/ConversionRECO/'
+RawDataLocalCopyPath = ''
+OutputFilePath = ''
 
 eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/2020_02_CMSTiming/KeySightScope/RecoData/ConversionRECO/"
 LocalMode=True
 Debug=False
-CopyToEOS=True
+CopyToEOS=False
 
 if os.path.exists("_condor_stdout"):
-    print "detected condor"
+    print("detected condor")
     LocalMode=False
 
 if LocalMode:
-    RawDataPath = '/home/daq/2019_04_April_CMSTiming/KeySightScope/KeySightScopeMount/'
-    RawDataLocalCopyPath = '/home/daq/2019_04_April_CMSTiming/KeySightScope/RawData/'
-    OutputFilePath = '/home/daq/2019_04_April_CMSTiming/KeySightScope/RecoData/ConversionRECO/'
+    RawDataPath = '/home/daq/ScopeMount/'
+    RawDataLocalCopyPath = '/home/daq/ScopeData/Raw/'
+    OutputFilePath = '/home/daq/ScopeData/Converted/'
 
 
 
@@ -164,17 +164,17 @@ def fast_Keysight_bin(filepath_in, index_in,n_points):
 
 #### Copy files locally, and if successful, move them to "to_delete" directory
 
-print "Copying files locally."
+print("Copying files locally.")
 rawFiles = RawDataPath + 'Wavenewscope_CH*_'+run+'.bin'
 if LocalMode: os.system('rsync -z -v %s %s && mv %s %s' % (rawFiles,RawDataLocalCopyPath,rawFiles,RawDataPath+"/to_delete/"))
 
-print "Starting conversion."
+print("Starting conversion.")
 ## read the input files
-print "file1"
+print("file1")
 inputFile1 = RawDataLocalCopyPath + 'Wavenewscope_CH1_'+run+'.bin'
-print "file2"
+print("file2")
 inputFile2 = RawDataLocalCopyPath + 'Wavenewscope_CH2_'+run+'.bin'
-print "file3"
+print("file3")
 inputFile3 = RawDataLocalCopyPath + 'Wavenewscope_CH3_'+run+'.bin'
 inputFile4 = RawDataLocalCopyPath + 'Wavenewscope_CH4_'+run+'.bin'
 
@@ -184,7 +184,7 @@ inputFile4 = RawDataLocalCopyPath + 'Wavenewscope_CH4_'+run+'.bin'
 # inputFile4 = '/home/daq/fnal_tb_18_11/AgilentMount/Wavenewscope_CH4_test_4000events.bin'
 
 n_points = keysight_get_points(inputFile1)[0]
-print n_points
+print(n_points)
 # inputFile1 = 'Wavenewscope_CH3_Apr2_87.bin'
 # inputFile2 = 'Wavenewscope_CH3_Apr2_87.bin'
 # inputFile3 = 'Wavenewscope_CH3_Apr2_87.bin'
@@ -194,8 +194,8 @@ input1 = fast_Keysight_bin(inputFile1,1,n_points) ## to get the number of segmen
 
 n_events = list (input1[1])[0] ## number of events/segments
 n_points = list(input1[2])[0] ## number of points acquired for each event/segment
-print "n_events = ", n_events
-print "n_points = ", n_points
+print("n_events = ", n_events)
+print("n_points = ", n_points)
 
 ## prepare the output files
 outputFile = '%srun_scope%s.root' % (OutputFilePath, run)
@@ -215,7 +215,7 @@ outTree.Branch('time', time, 'time[1]['+str(n_points)+']/F' )
 if Debug: n_events=1000
 for i in range(n_events):
     if i%1000==0:
-        print "Processing event %i" % i
+        print("Processing event %i" % i)
     channel[0] = fast_Keysight_bin(inputFile1, i+1, n_points)[0][1]
     channel[1] = fast_Keysight_bin(inputFile2, i+1, n_points)[0][1]
     channel[2] = fast_Keysight_bin(inputFile3, i+1, n_points)[0][1]
@@ -225,11 +225,12 @@ for i in range(n_events):
 
     outTree.Fill()
 
-print "done filling the tree"
+print("done filling the tree")
 outRoot.cd()
 outTree.Write()
 outRoot.Close()
 
-if CopyToEOS: os.system("xrdcp -fs %s %s" %(outputFile,eosPath)) 
-print "done copying to EOS"
+if CopyToEOS:
+    os.system("xrdcp -fs %s %s" %(outputFile,eosPath)) 
+    print("done copying to EOS")
 
