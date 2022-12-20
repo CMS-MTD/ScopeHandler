@@ -21,7 +21,7 @@ from shutil import copy
  
 stop_asap = False
 
-import visa
+import pyvisa
 
 def copytree(src, dst, symlinks=False, ignore=None):
     for item in os.listdir(src):
@@ -34,8 +34,8 @@ def copynew(source,destination):
 
 """#################SEARCH/CONNECT#################"""
 # establish communication with dpo
-rm = visa.ResourceManager("@py")
-dpo = rm.open_resource('TCPIP::192.168.133.159::INSTR')
+rm = pyvisa.ResourceManager("@py")
+dpo = rm.open_resource('TCPIP::192.168.200.159::INSTR')
 dpo.timeout = 3000000
 dpo.encoding = 'latin_1'
 print(dpo.query('*idn?'))
@@ -69,12 +69,12 @@ if trigCh != "AUX": trigCh = 'CHANnel'+trigCh
 trigLevel = float(args.trig)
 triggerSlope = args.trigSlope
 timeoffset = float(args.timeoffset)*1e-9
-print "timeoffset is ",timeoffset
+print("timeoffset is ",timeoffset)
 date = datetime.datetime.now()
 savewaves = int(args.save)
 timeout = float(args.timeout)
-print savewaves
-print "timeout is ",timeout
+print(savewaves)
+print("timeout is ",timeout)
 """#################CONFIGURE INSTRUMENT#################"""
 # variables for individual settings
 hScale = float(args.horizontalWindow)*1e-9
@@ -93,9 +93,9 @@ vScale_ch3 =float(args.vScale3) # in Volts for division
 vScale_ch4 =float(args.vScale4) # in Volts for division
 
 #vertical position
-vPos_ch1 = 3#0 #3  # in Divisions
-vPos_ch2 = -2#3 #3  # in Divisions
-vPos_ch3 = 3#-1 #3  # in Divisions
+vPos_ch1 = -3#0 #3  # in Divisions
+vPos_ch2 = -3#3 #3  # in Divisions
+vPos_ch3 = 0#-1 #3  # in Divisions
 vPos_ch4 = 3#3 #3  # in Divisions
 
 date = datetime.datetime.now()
@@ -104,18 +104,18 @@ date = datetime.datetime.now()
 # increment the last runNumber by 1
 
 if runNumberParam == -1:
-	RunNumberFile = '/home/daq/JARVIS/AutoPilot/otsdaq_runNumber.txt'
+	RunNumberFile = '/home/daq/etltest_0721/otsdaq_runNumber.txt'
 	with open(RunNumberFile) as file:
 	    runNumber = int(file.read())
 	print('######## Starting RUN {} ########\n'.format(runNumber))
 	print('---------------------\n')
 	print(date)
 	print('---------------------\n')
+	
+	with open(RunNumberFile,'w') as f:
+	    f.write(str(runNumber+1))
 
 else: runNumber = runNumberParam
-#with open('runNumber.txt','w') as file:
-#    file.write(str(runNumber+1))
-
 
 """#################SET THE OUTPUT FOLDER#################"""
 # The scope save runs localy on a shared folder with
@@ -143,7 +143,7 @@ dpo.write(':TIMebase:RANGe {}'.format(hScale)) ## Sets the full-scale horizontal
 dpo.write(':TIMebase:REFerence:PERCent 50') ## percent of screen location
 dpo.write(':ACQuire:SRATe:ANALog {}'.format(samplingrate))
 #dpo.write(':TIMebase:POSition 25E-9') ## offset
-print ':TIMebase:POSition {}'.format(timeoffset)
+print(':TIMebase:POSition {}'.format(timeoffset))
 dpo.write(':TIMebase:POSition {}'.format(timeoffset)) ## offset
 dpo.write(':ACQuire:MODE SEGMented') ## fast frame/segmented acquisition mode
 dpo.write(':ACQuire:SEGMented:COUNt {}'.format(numEvents)) ##number of segments to acquire
@@ -229,7 +229,7 @@ while True:
 #	print "Ader is ",dpo.query(':ADER?')
 #	print "OPC is ",dpo.query('*OPC?')
 	if (int(dpo.query(':ADER?')) == 1): 
-		print "Acquisition complete"
+		print("Acquisition complete")
 		break
 	else:
 		#print "Still waiting" 
@@ -252,8 +252,8 @@ tmp_file.close()
 duration = end - start
 trigRate = float(numEvents)/duration
 
-if not end_early: print "\nRun duration: %0.2f s. Trigger rate: %.2f Hz\n" % (duration,trigRate) 
-else: print "\nRun duration: %0.2f s. Trigger rate: unknown\n" % (duration) 
+if not end_early: print("\nRun duration: %0.2f s. Trigger rate: %.2f Hz\n" % (duration,trigRate))
+else: print("\nRun duration: %0.2f s. Trigger rate: unknown\n" % (duration) )
 if savewaves: 
 	dpo.write(':DISK:SEGMented ALL') ##save all segments (as opposed to just the current segment)
 	print(dpo.query('*OPC?'))
@@ -284,7 +284,7 @@ if savewaves:
 
 	print(dpo.query('*OPC?'))
 	print("Saved Channel 4 waveform")
-else: print "Skipping saving step."
+else: print("Skipping saving step.")
 tmp_file2 = open(run_log_path,"w")
 status = "ready"
 tmp_file2.write(status)
