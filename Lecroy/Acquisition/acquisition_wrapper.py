@@ -27,7 +27,7 @@ timeoffset = -100 #ns
 runNumber = -1 ### -1 means use serial number
 
 
-ScopeControlDir = "/home/daq/SensorBeam2022/ScopeHandler/Lecroy/"
+ScopeControlDir = "/home/daq/SensorBeam2023/ScopeHandler/Lecroy/"
 
 def ScopeAcquisition(numEvents):
 
