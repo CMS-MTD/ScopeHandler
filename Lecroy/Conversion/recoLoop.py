@@ -45,15 +45,18 @@ def RunEntriesScope(FileLocation, LGADChannels, LGADThreshold):
     else:
         return -1
 
-LGADChannels=[0,1,2]
+LGADChannels=[0,1,2,7]
 Threshold=15
 while True:
     ListRawFiles = [(x.split('C8--Trace')[1].split('.trc')[0]) for x in glob.glob('%s/C8--Trace*'%raw_path)]
     SetRawFiles = set([int(x) for x in ListRawFiles])
+    #### reprocess hack
+ #   SetRawFiles = set( range(153629,154321))#range(9500,11099) )
+        #+range(153629,154321))
   #  print "Found files: "
   #  print SetRawFiles
     for run in SetRawFiles:
-        RecoPath = '%s/converted_run_scope%i.root' % (converted_path,run)
+        RecoPath = '%s/converted_run%i.root' % (converted_path,run)
         RawPath = 'C8--Trace%i.trc' % run
 
         print 'lsof -f --/home/daq/LecroyMount/%s |grep -Eoi %s' % (RawPath, RawPath)
@@ -77,7 +80,7 @@ while True:
         
         OutputFile = '%s/run_scope%i.root' % (reco_path, run)
         #DattorootCmd = '/home/daq/ScopeTimingDAQ/TimingDAQ/NetScopeStandaloneDat2Root502 --input_file=%s/converted_run%i.root --output_file=%s --config=/home/daq/ScopeTimingDAQ/TimingDAQ/config/Lecroy_BetaSource.config --save_meas'  % (converted_path,run,OutputFile)
-        DattorootCmd = '/home/daq/ScopeTimingDAQ/TimingDAQ/NetScopeStandaloneDat2Root2002 --input_file=%s/converted_run%i.root --output_file=%s --config=/home/daq/ScopeTimingDAQ/TimingDAQ/config/Lecroy_BetaSource_v2.config --save_meas'  % (converted_path,run,OutputFile)
+        DattorootCmd = '/home/daq/ScopeTimingDAQ/TimingDAQ/NetScopeStandaloneDat2Root --correctForTimeOffsets --input_file=%s/converted_run%i.root --output_file=%s --config=/home/daq/ScopeTimingDAQ/TimingDAQ/config/Lecroy_BetaSource_v2.config --save_meas'  % (converted_path,run,OutputFile)
 
         print DattorootCmd
         os.system(DattorootCmd)
@@ -99,5 +102,5 @@ while True:
             os.system('ln -s /run/media/daq/ScanBackup/LecroyBackup/Raw/C%i--Trace%i.trc /home/daq/ScopeData/LecroyRaw/' % (i,run))
         os.system('ln -s /run/media/daq/ScanBackup/LecroyBackup/Converted/converted_run%i.root %s/converted_run%i.root' % (run,converted_path,run)) 
         print 'Done Moving and creating the link'
-
+    
     time.sleep(2)
