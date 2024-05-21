@@ -20,11 +20,11 @@ lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
 
-run_log_path = "/home/daq/SensorBeam2023/ScopeHandler/Lecroy/Acquisition/RunLog.txt"
+run_log_path = "/home/daq/2024_05_SNSPD_FCFD_ETL/ScopeHandler/Lecroy/Acquisition/RunLog.txt"
 
 
 def GetNextNumber():
-    run_num_file = "/home/daq/SensorBeam2023/ScopeHandler/Lecroy/Acquisition/next_run_number.txt"
+    run_num_file = "/home/daq/2024_05_SNSPD_FCFD_ETL/ScopeHandler/Lecroy/Acquisition/next_run_number.txt"
     FileHandle = open(run_num_file)
     nextNumber = int(FileHandle.read().strip())
     FileHandle.close()
