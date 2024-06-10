@@ -5,6 +5,7 @@ import time
 import optparse
 import argparse
 import os
+import sys
 
 nchan=8
 
@@ -22,15 +23,23 @@ eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/%s/LecroyScope/RecoDa
 
 LocalMode=True
 CopyToEOS=True
+isLPC = False
 
 if os.path.exists("_condor_stdout"):
 	print("Detected condor")
 	LocalMode=False
-
+else:
+    try:
+        user = os.environ['USER']
+        isLPC = 'cmslpc' in os.environ['HOSTNAME']
+    except:
+        print("Failed to find environment")
+    if isLPC:
+        print("Found user: {} Running on LPC: {}".format(user, isLPC))
+        LocalMode = False
 if LocalMode:
 	RawDataPath = "/home/daq/LecroyMount/"
 	RawDataLocalCopyPath = "/home/daq/%s/LecroyScope/RawData/" % BasePath
-
 if not LocalMode:
         OutputFilePath = ""
 
