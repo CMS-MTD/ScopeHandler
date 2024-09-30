@@ -1,95 +1,89 @@
 import uproot
-import matplotlib.pyplot as plt
 import numpy as np
 import os.path as path
-from scipy.optimize import curve_fit
 import awkward as ak
-import glob
+from awkward.highlevel import Array as akArray
 import time
-import pdb
 import os
 import argparse
 
-raw_path = "/home/etl/Test_Stand/daq/LecroyMount/"  # PATH TO THE SCOPE RAW DATA FOLDER
+#RAW_PATH = "/home/etl/Test_Stand/daq/LecroyMount/"  # PATH TO THE SCOPE RAW DATA FOLDER
 
-def linear(x, a, b):
-    return a*x + b
+def get_rising_edge_after_first_fall(nanoseconds: akArray, volts_scaled: akArray, thresh_low: int, thresh_high: int) -> tuple[akArray, akArray]:
+    """
+    INPUTS \n
+    nanoseconds: array of arrays of times of the square wave in nanoseconds \n
+    volts_scaled: array of arrays of the volts of the square waved scaled between 0 and 1 \n
+    thresh_low and thresh_high: between 0 and 1, select the values of where the edges are, chops the bottom and top of the square wave respectively \n
+    
+    RETURNS \n
+    Rising edge times and voltage values \n
 
-def find_cross_x(array, start, direction):
-    # array = np.abs(array)
-    minima = np.min(array)
-    maxima = np.max(array)
-    min_scale = np.abs(maxima - minima)/10.0
-    max_scale = np.abs(maxima - minima)*9.0/10.0
-    crossing_point = start
-    # for i in range(len(array)):
-    i = start
-    while i < len(array):
-        # print(array)
-        if i != 0 and (array[i] - array[i - 1]) > min_scale and direction < 0 and (array[i] - min(array)) > min_scale and (array[i] - min(array)) < max_scale:
-            crossing_point = i
-            break
-        if i != 0 and (array[i - 1] - array[i]) > min_scale and direction < 0 and (array[i] - min(array)) > min_scale and (array[i] - min(array)) < max_scale:
-            crossing_point = i
-            break
-        else:
-            i+=direction
-    return crossing_point
+    Returns the first rising edge of a square wave \n
+    Algorithm STEPS: \n
+    1. Make a mask of all falling edges from the square wave and get the indices of the square wave \n
+        - edges decided by thresh_low and thresh high, and falling decided by taking the difference between neighboring points of V and checking the sign \n
+    2. SELECT all points of the square wave AFTER the FALLING EDGE by checking for discontinuity in index (ex: 1,2,3,4,656 then remove 1,2,3,4) \n
+    3. Make a mask of all edges and get the indices of the filtered square wave from step 2
+    4. SELECT all points BEFORE the end of the first edge \n
+        - which is gaurenteed to be a rising edge and is detected by this index discontinuity method \n
+    5. Apply edge mask again to get just the first rising edge! \n
+    """
+    def edge_mask(V: akArray) -> akArray:
+        return ((thresh_low <= V) & (V <= thresh_high))
 
-def add_clock(tree):
-    channel = tree['channel'].array()
-    time = tree['time'].array()
-    nSamples = len(time)
-    clocks = channel[:,2] # Hardcoded clock channel
-    triggers = channel[:,1] # Hardcoded trigger channel
-    times = np.array(time[:,0])*10**9
-    # breakpoint()
-    clock = np.array(clocks)
-    minima = np.tile(np.min(clock, axis=1).reshape(-1,1), (1, len(clock[0])))
-    maxima = np.tile(np.max(clock, axis=1).reshape(-1,1), (1, len(clock[0])))
-    amp_fraction = 20 # %
-    amp = minima + np.abs(minima - maxima)*amp_fraction/100
+    def get_idx_between_edgs(edg_idxs: akArray) -> akArray:
+        #works like np.diff!
+        edg_diffs = edg_idxs[:, 1:] - edg_idxs[:, :-1]
+        #if there is a diff greater than one in index than we jumped to a new edge!
+        return edg_idxs[edg_diffs > 1] + 1
+    
+    square_wave = ak.zip({
+        "t": nanoseconds,
+        'V': volts_scaled
+    })
+    # !!!!!!!!!see docstring for steps!!!!!!!!!
+    # -------------[ STEP 1 ]---------------- #
+    sw_idxs = ak.local_index(square_wave)
+    falling_edg_mask = edge_mask(square_wave.V) & (np.diff(square_wave.V, append=np.inf) < 0)
+    # -------------[ STEP 2 ]---------------- #
+    #the [...,0] is important, grabs the first index out of each array, 99% of the time there is only one anyway
+    falling_transition_idx = get_idx_between_edgs( sw_idxs[falling_edg_mask] )[...,0] 
+    past_first_fall = sw_idxs[sw_idxs > falling_transition_idx[:,np.newaxis]]
+    sw_pff = square_wave[past_first_fall]    
 
-    min_scale = np.abs(maxima - minima)/10.0
+    # -------------[ STEP 3 ]---------------- #
+    sw_pff_idxs = ak.local_index(sw_pff)
+    all_edge_mask = edge_mask(sw_pff.V)
+    #the [...,0] is important, grabs the first index out of each array, 99% of the time there is only one anyway
+    # -------------[ STEP 3 ]---------------- #
+    rising_edg_pff = get_idx_between_edgs( sw_pff_idxs[all_edge_mask] )[...,0]
+    rising_after_falling = sw_pff_idxs[sw_pff_idxs < rising_edg_pff[:, np.newaxis]]
+    sw_rising_pff = sw_pff[rising_after_falling]
 
-    clock_diff = np.diff(clock, append=0)
-    clock_diff_mask = clock_diff > min_scale
-    # true after indices
-    check_prior_fall = clock_diff < -min_scale
-    prior_indices = np.argmax(check_prior_fall, axis=1)
+    # -------------[ STEP 4 ]---------------- #
+    e2mask = edge_mask(sw_rising_pff.V) #need to recut to just get rising edge
+    return sw_rising_pff[e2mask].t, sw_rising_pff[e2mask].V
 
-    prior_fall_mask = np.arange(check_prior_fall.shape[1]) >= prior_indices[:, None]
+def calc_clock(seconds: akArray, volts: akArray) -> akArray:
+    nanoseconds = seconds[:,0]*10**9
+    #SCALE the voltage so values are between 0 and 1
+    v_mins = ak.min(volts, axis=1, keepdims=True)
+    v_maxs = ak.max(volts, axis=1, keepdims=True)
+    volts_scaled = (volts - v_mins) / (v_maxs-v_mins)
 
-    # breakpoint()
-    global_mask = clock_diff_mask & prior_fall_mask
+    thresh_low, thresh_high = 0.25, 0.8
+    rising_times, rising_volts = get_rising_edge_after_first_fall(nanoseconds, volts_scaled, thresh_low, thresh_high)
+    fits = ak.linear_fit(rising_times, rising_volts, axis=-1)
 
-    # breakpoint()
-    times = np.where(global_mask, times, 0)
-    clock = np.where(global_mask, clock, 0)
-    # delete 0 values for each row
-    # breakpoint()
-    times = ak.Array([sublist[sublist != 0] for sublist in times])
-    clock = ak.Array([sublist[sublist != 0] for sublist in clock])
-
-    #print(times)
-    # breakpoint()
-    time_slope = times[:,1] - times[:,0]
-    clock_slope = clock[:,1] - clock[:,0]
-    slope = clock_slope / time_slope
-    ybias = clock[:,0] - slope*times[:,0]
-
-    # calculate 20% of the amplitude
-    amp = (minima + np.abs(minima - maxima)*amp_fraction/100)[:,0]
-    clock_timestamp = np.array((amp - ybias) / slope)
-    return clock_timestamp
+    #0.5 is take the point halfway of the clock amplitude, since the voltages are scaled!!
+    clock_stamp = (0.5 - fits['intercept'])/fits['slope'] # x = (y-b)/m
+    return clock_stamp #nanoseconds
 
 def merge_trees(files, trees, output_file):
     # Read ROOT files and trees
     ts = [uproot.open(files[t])[tree] for t, tree in enumerate(trees)]
     print(ts)
-
-    # Load data from trees .arrays()
-    clock = add_clock(uproot.open(files[1])["pulse"])
     datas = [t.arrays() for t in ts]
     lengths = [len(d) for d in datas]
     if np.all(np.array(lengths)==lengths[0]):
@@ -98,8 +92,18 @@ def merge_trees(files, trees, output_file):
         raise RuntimeError("Length mismatch of arrays, merging can't be done.")
     print(type(datas[0]))
     print(datas[1]["i_evt"])
+
+    # -----------ADD CLOCK TO DATA-------------#
+    scope_data = uproot.open(files[1])["pulse"]
+    scope_channels = scope_data['channel'].array()
+    CHANNEL_NUM = 1
+    clock = calc_clock(
+        scope_data['time'].array(), 
+        scope_channels[:, CHANNEL_NUM]
+    )
     print(len(clock))
     datas.append(ak.Array({"Clock": clock}))
+    #------------------------------------------#
 
     # Merge the two datasets
     merged_data  = {}
@@ -117,7 +121,6 @@ def merge_trees(files, trees, output_file):
     with uproot.recreate(output_file) as output:
         output[trees[0]] = {key: merged_data[key] for key in merged_data.keys()}
         print(output[trees[0]].num_entries)
-
 
 if __name__ == "__main__":
 
@@ -138,7 +141,9 @@ if __name__ == "__main__":
         f_index = int(args.runNumber)
     print(f_index, "\n")
     prev_status = 0
-    while True:
+
+    main_loop = True
+    while main_loop:
         reco_tree  = f"{base}/ScopeData/LecroyConverted/converted_run{f_index}.root"
         scope_tree = f"{base}/ScopeData/LecroyTimingDAQ/run_scope{f_index}.root"
         etroc_tree = f"{base}/ScopeData/ETROCData/output_run_{f_index}_rb0.root"
@@ -150,7 +155,7 @@ if __name__ == "__main__":
         if args.force: 
             reco = reco_2
             if not reco:
-                print ("Converted scope output does not exixst in force mode. Exiting")
+                print ("Converted scope output does not exist in force mode. Exiting")
                 break
         scope_1 = (open(f"{base}/Lecroy/Acquisition/merging.txt",                  "r").read() == "True")
         scope_2 = (path.isfile(scope_tree))
@@ -165,7 +170,10 @@ if __name__ == "__main__":
             if not etroc:
                 print("ETROC outputs does not exist in force mode. Exiting.")
                 break
+        
+        
         merged_file = f"{base}/ScopeData/LecroyMerged/run_{f_index}_rb0.root"
+        
         #merged_file2 = f"{base}/ScopeData/LecroyMerged/run_{f_index}_rb1.root"
         status = sum([reco_1, reco_2, scope_1, scope_2, etroc_1, etroc_2, not path.isfile(merged_file)])
 
@@ -242,3 +250,5 @@ if __name__ == "__main__":
             f.close()
         time.sleep(1)
         prev_status = status
+
+        main_loop = False
