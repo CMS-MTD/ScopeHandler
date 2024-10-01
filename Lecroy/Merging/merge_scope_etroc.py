@@ -56,12 +56,12 @@ def get_rising_edge_after_first_fall(nanoseconds: akArray, volts_scaled: akArray
     sw_pff_idxs = ak.local_index(sw_pff)
     all_edge_mask = edge_mask(sw_pff.V)
     #the [...,0] is important, grabs the first index out of each array, 99% of the time there is only one anyway
-    # -------------[ STEP 3 ]---------------- #
+    # -------------[ STEP 4 ]---------------- #
     rising_edg_pff = get_idx_between_edgs( sw_pff_idxs[all_edge_mask] )[...,0]
     rising_after_falling = sw_pff_idxs[sw_pff_idxs < rising_edg_pff[:, np.newaxis]]
     sw_rising_pff = sw_pff[rising_after_falling]
 
-    # -------------[ STEP 4 ]---------------- #
+    # -------------[ STEP 5 ]---------------- #
     e2mask = edge_mask(sw_rising_pff.V) #need to recut to just get rising edge
     return sw_rising_pff[e2mask].t, sw_rising_pff[e2mask].V
 
@@ -80,7 +80,7 @@ def calc_clock(seconds: akArray, volts: akArray) -> akArray:
     clock_stamp = (0.5 - fits['intercept'])/fits['slope'] # x = (y-b)/m
     return clock_stamp #nanoseconds
 
-def merge_trees(files, trees, output_file):
+def merge_trees(files:list[str], trees:list[str], output_file:str) -> None:
     # Read ROOT files and trees
     ts = [uproot.open(files[t])[tree] for t, tree in enumerate(trees)]
     print(ts)
@@ -96,7 +96,7 @@ def merge_trees(files, trees, output_file):
     # -----------ADD CLOCK TO DATA-------------#
     scope_data = uproot.open(files[1])["pulse"]
     scope_channels = scope_data['channel'].array()
-    CHANNEL_NUM = 1
+    CHANNEL_NUM = 2
     clock = calc_clock(
         scope_data['time'].array(), 
         scope_channels[:, CHANNEL_NUM]
@@ -147,15 +147,17 @@ if __name__ == "__main__":
         reco_tree  = f"{base}/ScopeData/LecroyConverted/converted_run{f_index}.root"
         scope_tree = f"{base}/ScopeData/LecroyTimingDAQ/run_scope{f_index}.root"
         etroc_tree = f"{base}/ScopeData/ETROCData/output_run_{f_index}_rb0.root"
+
         #etroc_tree1 = f"{base}/ScopeData/ETROCData/{f_index}_rb0.root"
         #etroc_tree2 = f"{base}/ScopeData/ETROCData/{f_index}_rb1.root"
         reco_1 = (open(f"{base}/Lecroy/Conversion/merging.txt",                    "r").read() == "True")
         reco_2 = (path.isfile(reco_tree))
         reco = reco_1 and reco_2
         if args.force: 
+            print(reco_2)
             reco = reco_2
             if not reco:
-                print ("Converted scope output does not exist in force mode. Exiting")
+                print (f"Converted scope output ({reco_tree}) does not exist in force mode. Exiting")
                 break
         scope_1 = (open(f"{base}/Lecroy/Acquisition/merging.txt",                  "r").read() == "True")
         scope_2 = (path.isfile(scope_tree))
@@ -171,9 +173,8 @@ if __name__ == "__main__":
                 print("ETROC outputs does not exist in force mode. Exiting.")
                 break
         
-        
-        merged_file = f"{base}/ScopeData/LecroyMerged/run_{f_index}_rb0.root"
-        
+        #merged_file = f"{base}/ScopeData/LecroyMerged/run_{f_index}_rb0.root"
+        merged_file = f"/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Merging/unit_test/run_{f_index}_rb0.root"
         #merged_file2 = f"{base}/ScopeData/LecroyMerged/run_{f_index}_rb1.root"
         status = sum([reco_1, reco_2, scope_1, scope_2, etroc_1, etroc_2, not path.isfile(merged_file)])
 
@@ -201,15 +202,15 @@ if __name__ == "__main__":
             #if path.isfile(etroc_tree2): 
             #    print(f"ETROC data: {etroc_tree2}")
             #    print(f"Merged data: {merged_file2}")
-            time.sleep(10)
+            time.sleep(3)
             if path.isfile(etroc_tree):
                 try:
                     if args.replace and os.path.exists(merged_file):
                         print(f"removing {merged_file}")
                         os.remove(merged_file)
                     merge_trees([reco_tree, scope_tree, etroc_tree], ["pulse", "pulse", "pulse"], merged_file)
-                    os.system(f"mv -f {merged_file} {bkp_folder}LecroyMerged/")
-                    os.system(f"ln -nsf {bkp_folder}LecroyMerged/run_{f_index}_rb0.root {merged_file}")
+                    # os.system(f"mv -f {merged_file} {bkp_folder}LecroyMerged/")
+                    # os.system(f"ln -nsf {bkp_folder}LecroyMerged/run_{f_index}_rb0.root {merged_file}")
                 except RuntimeError:
                     print(f"Merging step failed for run { merged_file}")
             '''        
