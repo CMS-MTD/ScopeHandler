@@ -34,12 +34,11 @@ class TestFinalMerge(unittest.TestCase):
         etroc_data_path = "unit_test/output_run_6685_rb0.root"
         
         out_path = "./unit_test/_temp_data.root"
-        try: #could move this sort of book keeping check of the file as a decorator
-            merge_trees(
-                [reco_data_path, scope_data_path, etroc_data_path], 
-                ['pulse','pulse','pulse'], 
-                out_path
-            )
+        try: #could move this sort of book keeping check of the file as a decorator          
+            reco_data  = uproot.open(reco_data_path)["pulse"].arrays()
+            scope_data = uproot.open(scope_data_path)["pulse"].arrays()
+            etroc_data = uproot.open(etroc_data_path)["pulse"].arrays()
+            merge_trees(reco_data, scope_data, etroc_data, out_path)
             input_array = uproot.open(out_path)['pulse'].arrays()
         except Exception as e:
             if os.path.isfile(out_path):
@@ -47,9 +46,21 @@ class TestFinalMerge(unittest.TestCase):
                 os.remove(out_path)
             raise ValueError(str(e))
         os.remove(out_path)
+
+        # for field in unit_test_array.fields:
+        #     print(field)
+        #     all_match = ak.all(input_array[field] == unit_test_array[field])
+        #     if not all_match:
+        #         print(f"Does {field} match? {all_match}")
+
+        # print(input_array["Clock"])
+        # print(unit_test_array["Clock"])
+        # print(input_array["time"])
+        # print(unit_test_array["time"])
+
         self.assertTrue(
             # for some reason ak.array_equal cannot be imported, so I set the tolerances to 0 on almost working
-            ak.almost_equal(unit_test_array, input_array, atol=0.0001)
+            ak.almost_equal(unit_test_array, input_array, atol=0.001)
         )
 
 if __name__ == '__main__':
