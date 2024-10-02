@@ -6,7 +6,7 @@ import time
 import os
 import argparse
 from clock import calc_clock
-import file_status as file
+import file_status
 
 BASE_DATA_DIR   = "/home/etl/Test_Stand/ETROC2_Test_Stand/ScopeHandler"
 
@@ -81,9 +81,9 @@ if __name__ == "__main__":
         scope_path = SCOPE_DATA_PATH(f_index)
         etroc_path = ETROC_DATA_PATH(f_index)
 
-        reco  = file.is_data_file_ready(reco_path,  LECROY_CONVERSION_MERGING_PATH,  force=args.force)
-        scope = file.is_data_file_ready(scope_path, LECROY_ACQUISITION_MERGING_PATH, force=args.force)
-        etroc = file.is_data_file_ready(etroc_path, MODULE_TEST_SW_MERGING,          force=args.force)
+        reco  = file_status.is_data_ready('CONVERSION DATA', reco_path,  LECROY_CONVERSION_MERGING_PATH,  force=args.force)
+        scope = file_status.is_data_ready('SCOPE DATA',      scope_path, LECROY_ACQUISITION_MERGING_PATH, force=args.force)
+        etroc = file_status.is_data_ready('ETROC DATA',      etroc_path, MODULE_TEST_SW_MERGING,          force=args.force)
         
         merged_file = os.path.join(
             OUTPUT_FILE_DIR(f_index), OUTPUT_FILENAME(f_index)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
             print(f"Reco data: {reco_path}")
             print(f"Scope data: {scope_path}")
             print(f"ETROC data: {etroc_path}")
-            time.sleep(3)
+            # time.sleep(3)
             if args.replace and os.path.exists(merged_file):
                 print(f"removing {merged_file}")
                 os.remove(merged_file)
@@ -110,8 +110,8 @@ if __name__ == "__main__":
             if args.runNumber!=-1: break #if I am specifying the run to merge I am only doing that one
 
             # Set status to False so new data can be taken
-            file.write_status(LECROY_CONVERSION_MERGING_PATH,  False)
-            file.write_status(LECROY_ACQUISITION_MERGING_PATH, False)
-            file.write_status(MODULE_TEST_SW_MERGING,          False)
-
+            file_status.write_status(LECROY_CONVERSION_MERGING_PATH,  False)
+            file_status.write_status(LECROY_ACQUISITION_MERGING_PATH, False)
+            file_status.write_status(MODULE_TEST_SW_MERGING,          False)
+        time.sleep(2)
         main_loop = False
