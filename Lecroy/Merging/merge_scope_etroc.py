@@ -19,7 +19,7 @@ RECO_TREE, SCOPE_TREE, ETROC_TREE = 'pulse', 'pulse', 'pulse'
 # CLOCK CONFIGURABLES
 CLOCK_THRESH_LOW, CLOCK_THRESH_HIGH = 0.25, 0.8 #used to pick out the edges (between 0 and 1, percentage of the absolute amplitude)
 CLOCK_MEAUREMENT_POINT = 0.5 #between 0 and 1, after the fit, where along the fitted y axis do we take the clock value
-CHANNEL_NUM = 2 #channel with square wave voltage (by index!! so subtract 1 to whatever it is on oscilloscope)
+CHANNEL_NUM = 1 #channel with square wave voltage (by index!! so subtract 1 to whatever it is on oscilloscope)
 
 # OUTPUT DATA PATHS
 OUTPUT_FILENAME = lambda run_num: f"run_{run_num}_rb0.root"
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     parser.add_argument('--force', default=False, action='store_true', help='skip reco/merge/scope is running checks',required=False)
     parser.add_argument('--replace', default=False, action='store_true', help='If a merge file already exists, it deletes it and replaces it',required=False)
     parser.add_argument('--no_sym_link', default=False, action='store_true', help='Turns off sym linking to backup')
+    parser.add_argument('--auto', default=False, action='store_true', help='If needed files exists it will auto run and merge the data.')
     args = parser.parse_args()
 
     if args.runNumber==-1:
@@ -77,6 +78,11 @@ if __name__ == "__main__":
 
     main_loop = True
     while main_loop:
+
+        #reco_loop(...)
+
+        #root_dumper(...)
+
         reco_path  = RECO_DATA_PATH(f_index) 
         scope_path = SCOPE_DATA_PATH(f_index)
         etroc_path = ETROC_DATA_PATH(f_index)
@@ -86,7 +92,7 @@ if __name__ == "__main__":
         etroc = file_status.is_data_ready('ETROC DATA',      etroc_path, MODULE_TEST_SW_MERGING,          force=args.force)
         
         merged_file = os.path.join(
-            OUTPUT_FILE_DIR(f_index), OUTPUT_FILENAME(f_index)
+            OUTPUT_FILE_DIR, OUTPUT_FILENAME(f_index)
         )
         print(f"Merged file: {merged_file} | Already Exist? {os.path.isfile(merged_file)}")
         if reco and scope and etroc:
@@ -113,5 +119,5 @@ if __name__ == "__main__":
             file_status.write_status(LECROY_CONVERSION_MERGING_PATH,  False)
             file_status.write_status(LECROY_ACQUISITION_MERGING_PATH, False)
             file_status.write_status(MODULE_TEST_SW_MERGING,          False)
-        time.sleep(2)
-        main_loop = False
+        #time.sleep(2)
+        #main_loop = False
