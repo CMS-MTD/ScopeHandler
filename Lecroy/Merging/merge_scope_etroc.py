@@ -8,7 +8,8 @@ import argparse
 from clock import calc_clock
 import file_status
 
-BASE_DATA_DIR   = "/home/etl/Test_Stand/ETROC2_Test_Stand/ScopeHandler"
+#BASE_DATA_DIR   = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler"
+BASE_DATA_DIR   = "../ScopeHandler"
 
 # INPUT DATA PATHS
 RECO_DATA_PATH  = lambda run_num: f"{BASE_DATA_DIR}/ScopeData/LecroyConverted/converted_run{run_num}.root"
@@ -31,7 +32,8 @@ OUTPUT_FILE_DIR = f"{BASE_DATA_DIR}/ScopeData/LecroyMerged/"
 NEXT_RUN_NUM_PATH               = f"{BASE_DATA_DIR}/Lecroy/Acquisition/next_run_number.txt"
 LECROY_CONVERSION_MERGING_PATH  = f"{BASE_DATA_DIR}/Lecroy/Conversion/merging.txt"
 LECROY_ACQUISITION_MERGING_PATH = f"{BASE_DATA_DIR}/Lecroy/Acquisition/merging.txt"
-MODULE_TEST_SW_MERGING          = f"/home/etl/Test_Stand/module_test_sw/merging.txt" #root dumper?
+# MODULE_TEST_SW_MERGING          = f"/home/etl/Test_Stand/module_test_sw/merging.txt" #root dumper?
+MODULE_TEST_SW_MERGING          = f"merging.txt" #root dumper?
 
 #RAW_PATH = "/home/etl/Test_Stand/daq/LecroyMount/"  # PATH TO THE SCOPE RAW DATA FOLDER
 
