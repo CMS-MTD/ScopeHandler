@@ -8,8 +8,7 @@ import argparse
 from clock import calc_clock
 import file_status
 
-#BASE_DATA_DIR   = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler"
-BASE_DATA_DIR   = "../ScopeHandler"
+BASE_DATA_DIR   = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler"
 
 # INPUT DATA PATHS
 RECO_DATA_PATH  = lambda run_num: f"{BASE_DATA_DIR}/ScopeData/LecroyConverted/converted_run{run_num}.root"
@@ -19,12 +18,12 @@ RECO_TREE, SCOPE_TREE, ETROC_TREE = 'pulse', 'pulse', 'pulse'
 
 # CLOCK CONFIGURABLES
 CLOCK_THRESH_LOW, CLOCK_THRESH_HIGH = 0.25, 0.8 #used to pick out the edges (between 0 and 1, percentage of the absolute amplitude)
-CLOCK_MEAUREMENT_POINT = 0.5 #between 0 and 1, after the fit, where along the fitted y axis do we take the clock value
-CHANNEL_NUM = 1 #channel with square wave voltage (by index!! so subtract 1 to whatever it is on oscilloscope)
+CLOCK_MEAUREMENT_POINT              = 0.5 #between 0 and 1, after the fit, where along the fitted y axis do we take the clock value
+CHANNEL_NUM                         = 1 #channel with square wave voltage (by index!! so subtract 1 to whatever it is on oscilloscope)
 
 # OUTPUT DATA PATHS
 OUTPUT_FILENAME = lambda run_num: f"run_{run_num}_rb0.root"
-BACKUP_FOLDER   = "/media/etl/Storage/LecroyMerged/"
+BACKUP_FOLDER   = "/media/etl/Storage/SPS_October_2024/LecroyMerged/"
 OUTPUT_FILE_DIR = f"{BASE_DATA_DIR}/ScopeData/LecroyMerged/"
 #OUTPUT_FILE_DIR = f"/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Merging/unit_test/run_{run_number}_rb0.root"
 
@@ -32,8 +31,7 @@ OUTPUT_FILE_DIR = f"{BASE_DATA_DIR}/ScopeData/LecroyMerged/"
 NEXT_RUN_NUM_PATH               = f"{BASE_DATA_DIR}/Lecroy/Acquisition/next_run_number.txt"
 LECROY_CONVERSION_MERGING_PATH  = f"{BASE_DATA_DIR}/Lecroy/Conversion/merging.txt"
 LECROY_ACQUISITION_MERGING_PATH = f"{BASE_DATA_DIR}/Lecroy/Acquisition/merging.txt"
-# MODULE_TEST_SW_MERGING          = f"/home/etl/Test_Stand/module_test_sw/merging.txt" #root dumper?
-MODULE_TEST_SW_MERGING          = f"merging.txt" #root dumper?
+MODULE_TEST_SW_MERGING          = f"/home/etl/Test_Stand/module_test_sw/merging.txt" #root dumper?
 
 #RAW_PATH = "/home/etl/Test_Stand/daq/LecroyMount/"  # PATH TO THE SCOPE RAW DATA FOLDER
 
@@ -122,7 +120,7 @@ if __name__ == "__main__":
                     os.system(f"mv -f {merged_file} {BACKUP_FOLDER}")
                     os.system(f"ln -nsf {os.path.join(BACKUP_FOLDER, OUTPUT_FILENAME(run_number))} {merged_file}")
 
-            #if args.runNumber!=-1: break #if I am specifying the run to merge I am only doing that one
+            if args.runNumber!=-1: break #if I am specifying the run to merge I am only doing that one
 
             # Set status to False so new data can be taken
             file_status.write_status(LECROY_CONVERSION_MERGING_PATH,  False)
@@ -138,6 +136,3 @@ if __name__ == "__main__":
             file_not_found_cntr += 1
 
         print('')
-
-        #time.sleep(2)
-        #main_loop = False

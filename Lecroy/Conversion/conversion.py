@@ -8,7 +8,6 @@ import os
 
 nchan=4
 active_chan=2#20GS/s
-eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/Test904/LecroyScope/RecoData/ConversionRECO"
 
 parser = argparse.ArgumentParser(description='Run info.')
 parser.add_argument('--runNumber',metavar='runNumber', type=str,default = -1, help='runNumber (default -1)',required=False)
@@ -16,64 +15,63 @@ args = parser.parse_args()
 
 initial = time.time()
 
+RawDataPath = ""
+RawDataLocalCopyPath = ""
+
+OutputFilePath = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/ScopeData/LecroyConverted"
+eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/Test904/LecroyScope/RecoData/ConversionRECO"
+
 LocalMode=True
 CopyToEOS=False
+
 if os.path.exists("_condor_stdout"):
     print("Detected condor")
     LocalMode=False
 
-LECROY_MOUNT_DIRECTORY = ""
-SCOPE_DATA_LECROY_RAW_DIRECTORY = ""
-LECROY_CONVERTED_DATA_DIRECTORY = "../ScopeHandler/ScopeData/LecroyConverted"
 if LocalMode:
-    LECROY_MOUNT_DIRECTORY = "/home/etl/Test_Stand/daq/LecroyMount" # ADD THE LECROY SCOPE RAW DATA FOLDER
-    SCOPE_DATA_LECROY_RAW_DIRECTORY = "../ScopeHandler/ScopeData/LecroyRaw"
-    # SCOPE_DATA_LECROY_RAW_DIRECTORY = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/ScopeData/LecroyRaw"
-    # SCOPE_DATA_LECROY_RAW_DIRECTORY = "/home/etl/Test_Stand/daq/Test904/LecroyScope/RawData/"
-    # SCOPE_DATA_LECROY_RAW_DIRECTORY = "/home/etl/Test_Stand/daq/ETL_TestingDAQ/ScopeHandler/ScopeData/LecroyTimingDAQ"
+    RawDataPath = "/home/etl/Test_Stand/daq/LecroyMount" # ADD THE LECROY SCOPE RAW DATA FOLDER
+    RawDataLocalCopyPath = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/ScopeData/LecroyRaw"
 
 if not LocalMode:
-        LECROY_CONVERTED_DATA_DIRECTORY = ""
+        OutputFilePath = ""
 #### Memory addresses #####
 WAVEDESC=11
-aTEMPLATE_NAME		= WAVEDESC+ 16
-aCOMM_TYPE			= WAVEDESC+ 32
-aCOMM_ORDER			= WAVEDESC+ 34
-aWAVE_DESCRIPTOR	= WAVEDESC+ 36	# length of the descriptor block
-aUSER_TEXT			= WAVEDESC+ 40	# length of the usertext block
+aTEMPLATE_NAME	    = WAVEDESC+ 16
+aCOMM_TYPE	    = WAVEDESC+ 32
+aCOMM_ORDER	    = WAVEDESC+ 34
+aWAVE_DESCRIPTOR    = WAVEDESC+ 36	# length of the descriptor block
+aUSER_TEXT	    = WAVEDESC+ 40	# length of the usertext block
 aTRIGTIME_ARRAY     = WAVEDESC+ 48
-aWAVE_ARRAY_1		= WAVEDESC+ 60	# length (in Byte) of the sample array
-aINSTRUMENT_NAME	= WAVEDESC+ 76
+aWAVE_ARRAY_1	    = WAVEDESC+ 60	# length (in Byte) of the sample array
+aINSTRUMENT_NAME    = WAVEDESC+ 76
 aINSTRUMENT_NUMBER  = WAVEDESC+ 92
-aTRACE_LABEL		= WAVEDESC+ 96
-aWAVE_ARRAY_COUNT	= WAVEDESC+ 116
+aTRACE_LABEL	    = WAVEDESC+ 96
+aWAVE_ARRAY_COUNT   = WAVEDESC+ 116
 aPNTS_PER_SECREEN   = WAVEDESC+ 120
 aFIRST_VALID_PNT    = WAVEDESC+ 124
 aLAST_VALID_PNT     = WAVEDESC+ 128
 aSEGMENT_INDEX      = WAVEDESC+ 140
 aSUBARRAY_COUNT     = WAVEDESC+ 144
 aNOM_SUBARRAY_COUNT = WAVEDESC+ 174
-aVERTICAL_GAIN		= WAVEDESC+ 156
-aVERTICAL_OFFSET	= WAVEDESC+ 160
-aNOMINAL_BITS		= WAVEDESC+ 172
+aVERTICAL_GAIN	    = WAVEDESC+ 156
+aVERTICAL_OFFSET    = WAVEDESC+ 160
+aNOMINAL_BITS	    = WAVEDESC+ 172
 aHORIZ_INTERVAL     = WAVEDESC+ 176
-aHORIZ_OFFSET		= WAVEDESC+ 180
-aVERTUNIT			= WAVEDESC+ 196
-aHORUNIT			= WAVEDESC+ 244
-aTRIGGER_TIME		= WAVEDESC+ 296
+aHORIZ_OFFSET	    = WAVEDESC+ 180
+aVERTUNIT	    = WAVEDESC+ 196
+aHORUNIT	    = WAVEDESC+ 244
+aTRIGGER_TIME	    = WAVEDESC+ 296
 aACQ_DURATION       = WAVEDESC+ 312
-aRECORD_TYPE		= WAVEDESC+ 316
-aPROCESSING_DONE	= WAVEDESC+ 318
-aTIMEBASE			= WAVEDESC+ 324
-aVERT_COUPLING		= WAVEDESC+ 326
-aPROBE_ATT			= WAVEDESC+ 328
-aFIXED_VERT_GAIN	= WAVEDESC+ 332
-aBANDWIDTH_LIMIT	= WAVEDESC+ 334
-aVERTICAL_VERNIER	= WAVEDESC+ 336
-aACQ_VERT_OFFSET	= WAVEDESC+ 340
-aWAVE_SOURCE		= WAVEDESC+ 344
-
-
+aRECORD_TYPE	    = WAVEDESC+ 316
+aPROCESSING_DONE    = WAVEDESC+ 318
+aTIMEBASE	    = WAVEDESC+ 324
+aVERT_COUPLING      = WAVEDESC+ 326
+aPROBE_ATT	    = WAVEDESC+ 328
+aFIXED_VERT_GAIN    = WAVEDESC+ 332
+aBANDWIDTH_LIMIT    = WAVEDESC+ 334
+aVERTICAL_VERNIER   = WAVEDESC+ 336
+aACQ_VERT_OFFSET    = WAVEDESC+ 340
+aWAVE_SOURCE	    = WAVEDESC+ 344
 
 def dump_info(filepath_in, index_in,n_points):
     x_axis = []
@@ -130,30 +128,30 @@ def dump_info(filepath_in, index_in,n_points):
     print("descriptor is ",wave_descriptor)
 
     my_file.seek(aUSER_TEXT)
-    USER_TEXT			= struct.unpack('i',my_file.read(4))#ReadLong(fid, aUSER_TEXT);
+    USER_TEXT = struct.unpack('i',my_file.read(4))#ReadLong(fid, aUSER_TEXT);
     my_file.seek(aWAVE_ARRAY_1)
-    WAVE_ARRAY_1		= struct.unpack('i',my_file.read(4))
+    WAVE_ARRAY_1 = struct.unpack('i',my_file.read(4))
     my_file.seek(aWAVE_ARRAY_COUNT)
-    WAVE_ARRAY_COUNT    = struct.unpack('i',my_file.read(4))
+    WAVE_ARRAY_COUNT = struct.unpack('i',my_file.read(4))
     my_file.seek(aPNTS_PER_SECREEN)
-    PNTS_PER_SCREEN    = struct.unpack('i',my_file.read(4))
+    PNTS_PER_SCREEN = struct.unpack('i',my_file.read(4))
     my_file.seek(aTRIGTIME_ARRAY)
-    TRIGTIME_ARRAY      = struct.unpack('i',my_file.read(4))
+    TRIGTIME_ARRAY = struct.unpack('i',my_file.read(4))
 
     my_file.seek(aSEGMENT_INDEX)
-    SEGMENT_INDEX      = struct.unpack('i',my_file.read(4))
+    SEGMENT_INDEX = struct.unpack('i',my_file.read(4))
     my_file.seek(aSUBARRAY_COUNT)
-    SUBARRAY_COUNT      = struct.unpack('i',my_file.read(4))
+    SUBARRAY_COUNT = struct.unpack('i',my_file.read(4))
     print("Actual segment count: ",SUBARRAY_COUNT)
     my_file.seek(aNOM_SUBARRAY_COUNT)
-    NOM_SUBARRAY_COUNT      = struct.unpack('h',my_file.read(2))
+    NOM_SUBARRAY_COUNT = struct.unpack('h',my_file.read(2))
     print("Target segment count: ",NOM_SUBARRAY_COUNT)
 
     my_file.seek(aTRIGGER_TIME)
-    TRIGGER_TIME      = struct.unpack('d',my_file.read(8))
+    TRIGGER_TIME = struct.unpack('d',my_file.read(8))
 
     my_file.seek(aACQ_DURATION)
-    ACQ_DURATION      = struct.unpack('f',my_file.read(4))
+    ACQ_DURATION = struct.unpack('f',my_file.read(4))
 
     print("User text ",USER_TEXT)
     print("Wave array",WAVE_ARRAY_1)
@@ -176,15 +174,15 @@ def dump_info(filepath_in, index_in,n_points):
     offset = WAVEDESC + wave_descriptor[0] + USER_TEXT[0] #+ TRIGTIME_ARRAY[0]
     my_file.seek(offset)
     print("offset ",offset)
-    time_event1      = struct.unpack('d',my_file.read(8))
-    offset_event1      = struct.unpack('d',my_file.read(8))
+    time_event1 = struct.unpack('d',my_file.read(8))
+    offset_event1 = struct.unpack('d',my_file.read(8))
 
     #my_file.seek(offset + 1000+ TRIGTIME_ARRAY[0])
-    time_event2      = struct.unpack('d',my_file.read(8))
-    offset_event2      = struct.unpack('d',my_file.read(8))
+    time_event2 = struct.unpack('d',my_file.read(8))
+    offset_event2 = struct.unpack('d',my_file.read(8))
 
-    time_event3      = struct.unpack('d',my_file.read(8))
-    offset_event3      = struct.unpack('d',my_file.read(8))
+    time_event3 = struct.unpack('d',my_file.read(8))
+    offset_event3 = struct.unpack('d',my_file.read(8))
 
     print("time event 1 ",time_event1)
     print("offset event 1 ",offset_event1)
@@ -193,14 +191,12 @@ def dump_info(filepath_in, index_in,n_points):
     print("time event 3 ",time_event3)
     print("offset event 3 ",offset_event3)
 
-
     my_file.seek(offset + TRIGTIME_ARRAY[0])
     b_y_data = my_file.read(1004)
     y_axis = struct.unpack("<"+str(502)+"h", b_y_data)
     data = [1000*vertical_gain*y for y in y_axis]
     #for y in data:
     #	print "%.2f" %y
-
 
 def get_waveform_block_offset(filepath_in):
     my_file = open(filepath_in, 'rb')
@@ -217,7 +213,6 @@ def get_waveform_block_offset(filepath_in):
     my_file.close()
     return offset,full_offset
 
-
 def get_configuration(filepath_in):
     my_file = open(filepath_in, 'rb')
     my_file.seek(aVERTICAL_GAIN)
@@ -227,13 +222,12 @@ def get_configuration(filepath_in):
     my_file.seek(aHORIZ_INTERVAL)
     horizontal_interval = struct.unpack('f',my_file.read(4))[0]
     my_file.seek(aSUBARRAY_COUNT)
-    nsegments      = struct.unpack('i',my_file.read(4))[0]
+    nsegments = struct.unpack('i',my_file.read(4))[0]
     my_file.seek(aWAVE_ARRAY_COUNT)
-    WAVE_ARRAY_COUNT    = struct.unpack('i',my_file.read(4))[0]
+    WAVE_ARRAY_COUNT = struct.unpack('i',my_file.read(4))[0]
     points_per_frame = int(WAVE_ARRAY_COUNT / nsegments)
     my_file.close()
     return [nsegments,points_per_frame,horizontal_interval,vertical_gain,vertical_offset]
-
 
 def get_segment_times(filepath_in,offset,nsegments):
     my_file = open(filepath_in, 'rb')
@@ -248,7 +242,6 @@ def get_segment_times(filepath_in,offset,nsegments):
     my_file.close()
     return trigger_times,horizontal_offsets
 
-
 def get_vertical_array(filepath_in,full_offset,points_per_frame,vertical_gain,vertical_offset,event_number):
     my_file = open(filepath_in, 'rb')
 
@@ -261,12 +254,9 @@ def get_vertical_array(filepath_in,full_offset,points_per_frame,vertical_gain,ve
     my_file.close()
     return y_axis
 
-
 def calc_horizontal_array(points_per_frame,horizontal_interval,horizontal_offset):
     x_axis = horizontal_offset + horizontal_interval * np.linspace(0, points_per_frame-1, points_per_frame)
     return x_axis
-
-
 
 runNumber = int(args.runNumber)
 print("\nProcessing run %i." % runNumber)
@@ -275,23 +265,23 @@ sourceFiles=[]
 inputFiles=[]
 start = time.time()
 for ic in range(1,nchan-1):#20GS/s
-	this_file = "%s/C%i--Trace%i.trc" % (LECROY_MOUNT_DIRECTORY, ic+1,runNumber)
+	this_file = "%s/C%i--Trace%i.trc" % (RawDataPath, ic+1,runNumber)
 	if LocalMode: 
 		print("Copying files locally and moving originals to deletion folder.")
-		inputFiles.append("%s/C%i--Trace%i.trc" % (SCOPE_DATA_LECROY_RAW_DIRECTORY, ic+1,runNumber))
-		#print 'rsync -z -v %s %s && mv %s %s' % (this_file,SCOPE_DATA_LECROY_RAW_DIRECTORY,this_file,LECROY_MOUNT_DIRECTORY+"/to_delete/")
-		#os.system('rsync -z -v %s %s && mv %s %s' % (this_file,SCOPE_DATA_LECROY_RAW_DIRECTORY,this_file,LECROY_MOUNT_DIRECTORY+"/to_delete/"))
-		os.system('rsync -z -v %s %s && mv %s %s' % (this_file, SCOPE_DATA_LECROY_RAW_DIRECTORY, this_file, LECROY_MOUNT_DIRECTORY+"/to_delete/"))
+		inputFiles.append("%s/C%i--Trace%i.trc" % (RawDataLocalCopyPath, ic+1,runNumber))
+		#print 'rsync -z -v %s %s && mv %s %s' % (this_file,RawDataLocalCopyPath,this_file,RawDataPath+"/to_delete/")
+		#os.system('rsync -z -v %s %s && mv %s %s' % (this_file,RawDataLocalCopyPath,this_file,RawDataPath+"/to_delete/"))
+		os.system('rsync -z -v %s %s && mv %s %s' % (this_file,RawDataLocalCopyPath,this_file,RawDataPath+"/to_delete/"))
 
 	else: inputFiles.append("C%i--Trace%i.trc" % (ic+1,runNumber)) ### condor copies files to current directory
 
 end = time.time()
 print("\nCopying files locally took %i seconds." % (end-start))
 
-outputFile = "%s/converted_run%i.root"%(LECROY_CONVERTED_DATA_DIRECTORY, runNumber)
-#outputFile = "%s/run_scope%i.root"%(LECROY_CONVERTED_DATA_DIRECTORY, runNumber)
+outputFile = "%s/converted_run%i.root"%(OutputFilePath, runNumber)
+#outputFile = "%s/run_scope%i.root"%(OutputFilePath, runNumber)
 
-#inputFile = "%s/C1--Trace--%05i.trc" %(LECROY_MOUNT_DIRECTORY,runNumber)  ### use ch1 to get information
+#inputFile = "%s/C1--Trace--%05i.trc" %(RawDataPath,runNumber)  ### use ch1 to get information
 ##### Get necessary information about format
 
 print("\n\n inputFiles" , inputFiles)

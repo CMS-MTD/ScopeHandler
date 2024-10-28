@@ -20,11 +20,11 @@ lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
 
-run_log_path = "/home/daq/SensorBeam2022/ScopeHandler/Lecroy/Acquisition/RunLog.txt"
+run_log_path = "/home/etl/Test_Stand/daq/SensorBeam2022/ScopeHandler/Lecroy/Acquisition/RunLog.txt"
 
 
 def GetNextNumber():
-    run_num_file = "/home/daq/SensorBeam2022/ScopeHandler/Lecroy/Acquisition/next_run_number.txt"
+    run_num_file = "/home/etl/Test_Stand/daq/SensorBeam2022/ScopeHandler/Lecroy/Acquisition/next_run_number.txt"
     FileHandle = open(run_num_file)
     nextNumber = int(FileHandle.read().strip())
     FileHandle.close()
@@ -245,13 +245,13 @@ print("Waveform storage complete. \n\tStoring waveforms took %0.4f s" % (end - s
 #time.sleep(0.5)
 
 ## renaming files with automatic numbering scheme.. no lnoger needed.
-#list_of_files = glob.glob('/home/daq/LecroyMount/*.trc') 
+#list_of_files = glob.glob('/home/etl/Test_Stand/daq/LecroyMount/*.trc') 
 #latest_file = max(list_of_files, key=os.path.getctime)
 
 #autoRunNum = latest_file.split("Trace")[1].split(".trc")[0]
 #print "Lecroy run number: %s. Renaming to run %s."%(autoRunNum,runNumber)
 #for chan in range(1,nchan+1):
-#	os.rename("/home/daq/LecroyMount/C%iTrace%s.trc" % (chan,autoRunNum), "/home/daq/LecroyMount/C%iTrace%s.trc" % (chan,runNumber))
+#	os.rename("/home/etl/Test_Stand/daq/LecroyMount/C%iTrace%s.trc" % (chan,autoRunNum), "/home/etl/Test_Stand/daq/LecroyMount/C%iTrace%s.trc" % (chan,runNumber))
 
 #lecroy.write("WAIT")
 

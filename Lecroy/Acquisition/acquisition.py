@@ -21,17 +21,14 @@ lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
 
-# run_log_path = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Acquisition/RunLog.txt" #DEPRECATED FOR THE PATHING DONE BELOW
-ACQUISITION_DIRECTORY = "../ScopeHandler/Lecroy/Acquisition"
+run_log_path = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Acquisition/RunLog.txt"
 
 def GetNextNumber():
-    run_num_file = f"{ACQUISITION_DIRECTORY}/next_run_number.txt"
-    FileHandle = open(run_num_file)
-    nextNumber = int(FileHandle.read().strip())
-    FileHandle.close()
-    FileHandle = open(run_num_file,"w")
-    FileHandle.write(str(nextNumber+1)+"\n") 
-    FileHandle.close()
+    run_num_file = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Acquisition/next_run_number.txt"
+    with open(run_num_file) as file:
+        nextNumber = int(file.read().strip())
+    with open(run_num_file, "w") as file:
+        file.write(f"{nextNumber + 1}\n")
     return nextNumber
 
 nchan=4
@@ -88,9 +85,8 @@ date = datetime.datetime.now()
 if runNumber==-1:
 	runNumber=GetNextNumber()
 #### Initial preparation
-print("Next run number: %i"%runNumber)
-
-print("\n \nPreparing {}-channel scope. \n".format(nchan))
+print(f"Next run number: {runNumber}")
+print(f"\n \nPreparing {nchan}-channel scope. \n")
 lecroy.write('STOP')
 lecroy.write("*CLS")
 lecroy.write("COMM_HEADER OFF")
@@ -98,7 +94,6 @@ if args.display == 0: lecroy.write("DISPLAY ON")
 else: 
     lecroy.write("DISPLAY ON")
     lecroy.write('DISPLAY:ACQUIRE:COUNT ON')
-
 
 ####### Vertical setup ######
 vScales_in_mV = []
@@ -123,41 +118,39 @@ vOffsets_in_mV.append(int(1000* args.vScale4 * args.vPos4))
 print("Vertical setup.")
 # for chan in range(1,nchan+1):
 for chan in range(2,nchan): #20GS/s
-	print("\tChannel %i: %i mV/div, %i mV offset. "% (chan, vScales_in_mV[chan-1],vOffsets_in_mV[chan-1]))
-	lecroy.write("C%i:COUPLING D50"%(chan))
-	lecroy.write("C%i:VOLT_DIV %iMV"%(chan, vScales_in_mV[chan-1]))
-	lecroy.write("C%i:OFFSET %iMV"%(chan, vOffsets_in_mV[chan-1]))
+    print(f"\tChannel {chan}: {vScales_in_mV[chan-1]} mV/div, {vOffsets_in_mV[chan-1]} mV offset.")
+    lecroy.write(f"C{chan}:COUPLING D50")
+    lecroy.write(f"C{chan}:VOLT_DIV {vScales_in_mV[chan-1]}MV")
+    lecroy.write(f"C{chan}:OFFSET {vOffsets_in_mV[chan-1]}MV")
 
 ### Disable bandwidth limit
 lecroy.write("BANDWIDTH_LIMIT OFF")
 
-
 ####### Horizontal setup ########
 
 time_div_in_ns = int(args.horizontalWindow)/10 ## specify full window as argument
-print("\nTimebase: %i ns/div." % time_div_in_ns)
+print(f"\nTimebase: {time_div_in_ns} ns/div.")
 if time_div_in_ns != 2 and time_div_in_ns != 5 and time_div_in_ns!=500000 and time_div_in_ns!=1000000:
 	print("Warning: time base must fit predefined set of possible values.")
 sample_rate_in_GS = args.sampleRate
 
-lecroy.write("TIME_DIV %iNS"%time_div_in_ns)
+lecroy.write(f"TIME_DIV {time_div_in_ns}NS")
 # print("\tMake sure sampling rate is set to 10 GS/s manually.")
 print("\tMake sure sampling rate is set to 20 GS/s manually.") #20GS/s
 # lecroy.write("TIME_DIV e-9")
 
-print("Setting horizontal offset 50 %i ns" %args.timeoffset)
-lecroy.write("TRIG_DELAY %i ns"%args.timeoffset)
+print(f"Setting horizontal offset 50 {args.timeoffset} ns")
+lecroy.write(f"TRIG_DELAY {args.timeoffset} ns")
+print(args.trigCh)
 
-print (args.trigCh)
 ####### Trigger setup ######
 lecroy.write("TRIG_SELECT Edge,SR,%s"%args.trigCh)
 
 if args.trigCh != "LINE":
-	lecroy.write("%s:TRLV %0.3fV"%(args.trigCh,args.trig))
-	lecroy.write("TRIG_SLOPE %s" %args.trigSlope)
+    lecroy.write(f"{args.trigCh}:TRLV {args.trig:.3f}V")
+    lecroy.write(f"TRIG_SLOPE {args.trigSlope}")
 
-print("\nTriggering on %s with %0.3fV threshold, %s polarity." %(args.trigCh,args.trig,args.trigSlope))
-
+print(f"\nTriggering on {args.trigCh} with {args.trig:.3f}V threshold, {args.trigSlope} polarity.")
 #lecroy.write("TRIG_SELECT Edge,SR,LINE")
 #lecroy.write("TRIG_SELECT Edge,SR,EX")
 # lecroy.write("EX:TRSL POS")
@@ -169,15 +162,12 @@ lecroy.write("STORE_SETUP ALL_DISPLAYED,HDD,AUTO,OFF,FORMAT,BINARY")
 
 nevents = int(args.numEvents)
 ##Sequence configuration
-print("\nTaking %i events in sequence mode."%nevents)
-lecroy.write("SEQ ON,%i"%nevents)
-status = ""
-status = "busy"
+print(f"\nTaking {nevents} events in sequence mode.")
+lecroy.write(f"SEQ ON,{nevents}")
 
-run_logf = open(f"{ACQUISITION_DIRECTORY}/RunLog.txt","w")
-run_logf.write(status)
-#run_logf.write("\n")
-run_logf.close()
+with open(run_log_path, "w") as run_logf:
+    run_logf.write("busy")
+    # run_logf.write("\n")
 start = time.time()
 now = datetime.datetime.now()
 current_time = now.strftime("%H:%M:%S")
@@ -211,11 +201,9 @@ print("\tTrigger rate: %0.1f Hz" %(nevents/duration))
 # print("Storage configuration:")
 # print(lecroy.query("STORE_SETUP?"))
 print("\n\n  -------------  Beginning save waveforms.  ----------------------")
-tmp_file = open(f"{ACQUISITION_DIRECTORY}/RunLog.txt","w")
-status = "writing"
-tmp_file.write(status)
-tmp_file.write("\n")
-tmp_file.close()
+with open(run_log_path, "w") as tmp_file:
+    tmp_file.write("writing")
+    tmp_file.write("\n")
 
 start = time.time()
 ### save all active channels with single command, using ALL_DISPLAYED ###
@@ -229,15 +217,15 @@ lecroy.write("STORE")
 
 # for ichan in range(1,nchan+1):
 for ichan in range(2,nchan):#20GS/s
-    print("Saving channel %i"%ichan)
-    lecroy.write("STORE_SETUP C%i,HDD,AUTO,OFF,FORMAT,BINARY"%ichan)
+    print(f"Saving channel {ichan}")
+    lecroy.write(f"STORE_SETUP C{ichan},HDD,AUTO,OFF,FORMAT,BINARY")
     lecroy.write(r"""vbs 'app.SaveRecall.Waveform.SaveFilename="C%i--Trace%i.trc" ' """%(ichan,int(runNumber)))
     lecroy.write(r"""vbs 'app.SaveRecall.Waveform.SaveFile' """)
     lecroy.query("ALST?")
 
 lecroy.query("ALST?")
 end = time.time()
-print("Waveform storage complete. \n\tStoring waveforms took %0.4f s" % (end - start))
+print(f"Waveform storage complete. \n\tStoring waveforms took {end - start:.4f} s")
 #time.sleep(0.5)
 
 ## renaming files with automatic numbering scheme.. no lnoger needed.
@@ -257,14 +245,10 @@ for x in range(1,10):
 
 lecroy.close()
 rm.close()
+
 final = time.time()
-print("\nFinished run %i."%runNumber)
-print("Full script duration: %0.f s"%(final-initial))
-tmp_file2 = open(f"{ACQUISITION_DIRECTORY}/RunLog.txt","w")
-status = "ready"
-
-tmp_file2.write(status)
-tmp_file2.write("\n")
-tmp_file2.close()
-
-
+print(f"\nFinished run {runNumber}.")
+print(f"Full script duration: {final - initial:.0f} s")
+with open(run_log_path, "w") as tmp_file2:
+    tmp_file2.write("ready")
+    tmp_file2.write("\n")
