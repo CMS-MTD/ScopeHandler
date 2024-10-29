@@ -1,5 +1,4 @@
 ### if sample rate or horizontal window is changed, TimingDAQ must be recompiled to account for new npoints.
-import sys
 import os
 import argparse
 # sampleRate = 1000 #GSa/s ### not sure if works for Lecroy

@@ -1,13 +1,7 @@
-import numpy as np
-import sys
-import optparse
 import argparse
-import signal
 import os
 import time
-import shutil
 import datetime
-from shutil import copy
 import visa
 import glob
 

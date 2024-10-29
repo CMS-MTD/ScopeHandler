@@ -29,57 +29,52 @@ if os.path.exists("_condor_stdout"):
 
 if LocalMode:
 	RawDataPath = "/home/etl/Test_Stand/daq/LecroyMount" # ADD THE LECROY SCOPE RAW DATA FOLDER
-	RawDataLocalCopyPath = "/home/etl/Test_Stand/daq/Test904/LecroyScope/RawData" # ADD THE LOCAL RAW DATA PATH
-
-	# RawDataLocalCopyPath = "/home/etl/Test_Stand/daq/ScopeData/LecroyRaw/"
+	RawDataLocalCopyPath = "/home/etl/Test_Stand/daq/ScopeData/LecroyRaw/"
 if not LocalMode:
 	OutputFilePath = ""
 
 #### Memory addresses #####
 WAVEDESC=11
-aTEMPLATE_NAME		= WAVEDESC+ 16;
-aCOMM_TYPE			= WAVEDESC+ 32;
-aCOMM_ORDER			= WAVEDESC+ 34;
-aWAVE_DESCRIPTOR	= WAVEDESC+ 36;	# length of the descriptor block
-aUSER_TEXT			= WAVEDESC+ 40;	# length of the usertext block
-aTRIGTIME_ARRAY     = WAVEDESC+ 48;
-aWAVE_ARRAY_1		= WAVEDESC+ 60;	# length (in Byte) of the sample array
-aINSTRUMENT_NAME	= WAVEDESC+ 76;
-aINSTRUMENT_NUMBER  = WAVEDESC+ 92;
-aTRACE_LABEL		= WAVEDESC+ 96;
-aWAVE_ARRAY_COUNT	= WAVEDESC+ 116;
-aPNTS_PER_SECREEN = WAVEDESC+120
-aFIRST_VALID_PNT = WAVEDESC+124
-aLAST_VALID_PNT = WAVEDESC+128
-aSEGMENT_INDEX = WAVEDESC+140;
-aSUBARRAY_COUNT = WAVEDESC+144
+aTEMPLATE_NAME	    = WAVEDESC+16;
+aCOMM_TYPE	    = WAVEDESC+32;
+aCOMM_ORDER	    = WAVEDESC+34;
+aWAVE_DESCRIPTOR    = WAVEDESC+36;	# length of the descriptor block
+aUSER_TEXT	    = WAVEDESC+40;	# length of the usertext block
+aTRIGTIME_ARRAY     = WAVEDESC+48;
+aWAVE_ARRAY_1	    = WAVEDESC+60;	# length (in Byte) of the sample array
+aINSTRUMENT_NAME    = WAVEDESC+76;
+aINSTRUMENT_NUMBER  = WAVEDESC+92;
+aTRACE_LABEL	    = WAVEDESC+96;
+aWAVE_ARRAY_COUNT   = WAVEDESC+116;
+aPNTS_PER_SECREEN   = WAVEDESC+120
+aFIRST_VALID_PNT    = WAVEDESC+124
+aLAST_VALID_PNT     = WAVEDESC+128
+aSEGMENT_INDEX      = WAVEDESC+140;
+aSUBARRAY_COUNT     = WAVEDESC+144
 aNOM_SUBARRAY_COUNT = WAVEDESC+174
-aVERTICAL_GAIN		= WAVEDESC+ 156;
-aVERTICAL_OFFSET	= WAVEDESC+ 160;
-aNOMINAL_BITS		= WAVEDESC+ 172;
-aHORIZ_INTERVAL     = WAVEDESC+ 176;
-aHORIZ_OFFSET		= WAVEDESC+ 180;
-aVERTUNIT			= WAVEDESC+ 196;
-aHORUNIT			= WAVEDESC+ 244;
-aTRIGGER_TIME		= WAVEDESC+ 296;
-aACQ_DURATION = WAVEDESC+312;
-aRECORD_TYPE		= WAVEDESC+ 316;
-aPROCESSING_DONE	= WAVEDESC+ 318;
-aTIMEBASE			= WAVEDESC+ 324;
-aVERT_COUPLING		= WAVEDESC+ 326;
-aPROBE_ATT			= WAVEDESC+ 328;
-aFIXED_VERT_GAIN	= WAVEDESC+ 332;
-aBANDWIDTH_LIMIT	= WAVEDESC+ 334;
-aVERTICAL_VERNIER	= WAVEDESC+ 336;
-aACQ_VERT_OFFSET	= WAVEDESC+ 340;
-aWAVE_SOURCE		= WAVEDESC+ 344;
-
-
+aVERTICAL_GAIN	    = WAVEDESC+156;
+aVERTICAL_OFFSET    = WAVEDESC+160;
+aNOMINAL_BITS	    = WAVEDESC+172;
+aHORIZ_INTERVAL     = WAVEDESC+176;
+aHORIZ_OFFSET	    = WAVEDESC+180;
+aVERTUNIT	    = WAVEDESC+196;
+aHORUNIT	    = WAVEDESC+244;
+aTRIGGER_TIME	    = WAVEDESC+296;
+aACQ_DURATION       = WAVEDESC+312;
+aRECORD_TYPE	    = WAVEDESC+316;
+aPROCESSING_DONE    = WAVEDESC+318;
+aTIMEBASE           = WAVEDESC+324;
+aVERT_COUPLING	    = WAVEDESC+326;
+aPROBE_ATT	    = WAVEDESC+328;
+aFIXED_VERT_GAIN    = WAVEDESC+332;
+aBANDWIDTH_LIMIT    = WAVEDESC+334;
+aVERTICAL_VERNIER   = WAVEDESC+336;
+aACQ_VERT_OFFSET    = WAVEDESC+340;
+aWAVE_SOURCE	    = WAVEDESC+344;
 
 def dump_info(filepath_in, index_in,n_points):
 	x_axis = []
 	y_axis = []
-
 	# read from file
 	my_index = index_in
 	# start = time.time()
@@ -129,30 +124,29 @@ def dump_info(filepath_in, index_in,n_points):
 	print("descriptor is ",wave_descriptor)
 
 	my_file.seek(aUSER_TEXT)
-	USER_TEXT			= struct.unpack('i',my_file.read(4))#ReadLong(fid, aUSER_TEXT);
+	USER_TEXT = struct.unpack('i',my_file.read(4))#ReadLong(fid, aUSER_TEXT);
 	my_file.seek(aWAVE_ARRAY_1)
-	WAVE_ARRAY_1		= struct.unpack('i',my_file.read(4))
+	WAVE_ARRAY_1 = struct.unpack('i',my_file.read(4))
 	my_file.seek(aWAVE_ARRAY_COUNT)
-	WAVE_ARRAY_COUNT    = struct.unpack('i',my_file.read(4))
+	WAVE_ARRAY_COUNT = struct.unpack('i',my_file.read(4))
 	my_file.seek(aPNTS_PER_SECREEN)
-	PNTS_PER_SCREEN    = struct.unpack('i',my_file.read(4))
+	PNTS_PER_SCREEN = struct.unpack('i',my_file.read(4))
 	my_file.seek(aTRIGTIME_ARRAY)
-	TRIGTIME_ARRAY      = struct.unpack('i',my_file.read(4))
+	TRIGTIME_ARRAY = struct.unpack('i',my_file.read(4))
 
 	my_file.seek(aSEGMENT_INDEX)
-	SEGMENT_INDEX      = struct.unpack('i',my_file.read(4))
+	SEGMENT_INDEX = struct.unpack('i',my_file.read(4))
 	my_file.seek(aSUBARRAY_COUNT)
-	SUBARRAY_COUNT      = struct.unpack('i',my_file.read(4))
+	SUBARRAY_COUNT = struct.unpack('i',my_file.read(4))
 	print("Actual segment count: ",SUBARRAY_COUNT)
 	my_file.seek(aNOM_SUBARRAY_COUNT)
-	NOM_SUBARRAY_COUNT      = struct.unpack('h',my_file.read(2))
+	NOM_SUBARRAY_COUNT = struct.unpack('h',my_file.read(2))
 	print("Target segment count: ",NOM_SUBARRAY_COUNT)
 
 	my_file.seek(aTRIGGER_TIME)
-	TRIGGER_TIME      = struct.unpack('d',my_file.read(8))
-
+	TRIGGER_TIME = struct.unpack('d',my_file.read(8))
 	my_file.seek(aACQ_DURATION)
-	ACQ_DURATION      = struct.unpack('f',my_file.read(4))
+	ACQ_DURATION = struct.unpack('f',my_file.read(4))
 
 	print("User text ",USER_TEXT)
 	print("Wave array",WAVE_ARRAY_1)
@@ -175,15 +169,15 @@ def dump_info(filepath_in, index_in,n_points):
 	offset = WAVEDESC + wave_descriptor[0] + USER_TEXT[0] #+ TRIGTIME_ARRAY[0]
 	my_file.seek(offset)
 	print(offset)
-	time_event1      = struct.unpack('d',my_file.read(8))
-	offset_event1      = struct.unpack('d',my_file.read(8))
+	time_event1 = struct.unpack('d',my_file.read(8))
+	offset_event1 = struct.unpack('d',my_file.read(8))
 
 	#my_file.seek(offset + 1000+ TRIGTIME_ARRAY[0])
-	time_event2      = struct.unpack('d',my_file.read(8))
-	offset_event2      = struct.unpack('d',my_file.read(8))
+	time_event2 = struct.unpack('d',my_file.read(8))
+	offset_event2 = struct.unpack('d',my_file.read(8))
 
-	time_event3      = struct.unpack('d',my_file.read(8))
-	offset_event3      = struct.unpack('d',my_file.read(8))
+	time_event3 = struct.unpack('d',my_file.read(8))
+	offset_event3 = struct.unpack('d',my_file.read(8))
 
 	print("time event 1 ",time_event1)
 	print("offset event 1 ",offset_event1)
@@ -192,14 +186,12 @@ def dump_info(filepath_in, index_in,n_points):
 	print("time event 3 ",time_event3)
 	print("offset event 3 ",offset_event3)
 
-
 	my_file.seek(offset + TRIGTIME_ARRAY[0])
 	b_y_data = my_file.read(1004)
 	y_axis = struct.unpack("<"+str(502)+"h", b_y_data)
 	data = [1000*vertical_gain*y for y in y_axis]
 	#for y in data:
 	#	print "%.2f" %y
-
 
 def get_waveform_block_offset(filepath_in):
 	my_file = open(filepath_in, 'rb')
@@ -216,7 +208,6 @@ def get_waveform_block_offset(filepath_in):
 	my_file.close()
 	return offset,full_offset
 
-
 def get_configuration(filepath_in):
 	my_file = open(filepath_in, 'rb')
 	my_file.seek(aVERTICAL_GAIN)
@@ -228,32 +219,26 @@ def get_configuration(filepath_in):
 	my_file.seek(aHORIZ_OFFSET)
 	horizontal_offset = struct.unpack('d',my_file.read(8))
 	my_file.seek(aSUBARRAY_COUNT)
-	nsegments      = struct.unpack('i',my_file.read(4))[0]
+	nsegments = struct.unpack('i',my_file.read(4))[0]
 	my_file.seek(aWAVE_ARRAY_COUNT)
-	WAVE_ARRAY_COUNT    = struct.unpack('i',my_file.read(4))[0]
+	WAVE_ARRAY_COUNT = struct.unpack('i',my_file.read(4))[0]
 	points_per_frame = int(WAVE_ARRAY_COUNT / nsegments)
 	my_file.close()
 	return [nsegments,points_per_frame,horizontal_interval,vertical_gain,vertical_offset,horizontal_offset]
-
 
 def get_segment_times(filepath_in,offset,nsegments):
 	my_file = open(filepath_in, 'rb')
 	trigger_times = []
 	horizontal_offsets = []
-
 	my_file.seek(offset)
 	for i_event in range(nsegments):
 		trigger_times.append(struct.unpack('d',my_file.read(8))[0])
 		horizontal_offsets.append(struct.unpack('d',my_file.read(8))[0])
-	
 	my_file.close()
 	return trigger_times,horizontal_offsets
 
-
 def get_vertical_array(filepath_in,full_offset,points_per_frame,vertical_gain,vertical_offset,event_number):
 	my_file = open(filepath_in, 'rb')
-
-
 	my_file.seek(aHORIZ_OFFSET)
 	horizontal_offset = struct.unpack('d',my_file.read(8))[0]
 	#print horizontal_offset
@@ -272,20 +257,12 @@ def get_vertical_array(filepath_in,full_offset,points_per_frame,vertical_gain,ve
 
 	return y_axis,horizontal_offset
 
-
-
 def calc_horizontal_array(points_per_frame,horizontal_interval,horizontal_offset):
-
 	#print "Horizontal offset is ",horizontal_offset
 	#print "Horizontal interval is ",horizontal_interval
 	x_axis = horizontal_offset + horizontal_interval * np.linspace(0, points_per_frame-1, points_per_frame)
 	
 	return x_axis
-
-
-
-
-
 
 runNumber = int(args.runNumber)
 print("\nProcessing run %i." % runNumber)
@@ -381,8 +358,8 @@ for i in range(nsegments):
     channel[5],horizontal_offset5 = get_vertical_array(inputFiles[5],full_offset,points_per_frame,vertical_gains[5],vertical_offsets[5],i)
     channel[6],horizontal_offset6 = get_vertical_array(inputFiles[6],full_offset,points_per_frame,vertical_gains[6],vertical_offsets[6],i)
     channel[7],horizontal_offset7 = get_vertical_array(inputFiles[7],full_offset,points_per_frame,vertical_gains[7],vertical_offsets[7],i)
-    time_array[0]    = calc_horizontal_array(points_per_frame,horizontal_interval,horizontal_offset0)
-    i_evt[0]   = i
+    time_array[0] = calc_horizontal_array(points_per_frame,horizontal_interval,horizontal_offset0)
+    i_evt[0] = i
     time_offsets[0] = 0
     time_offsets[1] = horizontal_offset1-horizontal_offset0
     time_offsets[2] = horizontal_offset2-horizontal_offset0

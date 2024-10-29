@@ -2,7 +2,6 @@ import struct  #struct unpack result - tuple
 import numpy as np
 from ROOT import TTree, TFile
 import time
-import optparse
 import argparse
 import os
 
@@ -36,42 +35,42 @@ if not LocalMode:
         OutputFilePath = ""
 #### Memory addresses #####
 WAVEDESC=11
-aTEMPLATE_NAME	    = WAVEDESC+ 16
-aCOMM_TYPE	    = WAVEDESC+ 32
-aCOMM_ORDER	    = WAVEDESC+ 34
-aWAVE_DESCRIPTOR    = WAVEDESC+ 36	# length of the descriptor block
-aUSER_TEXT	    = WAVEDESC+ 40	# length of the usertext block
-aTRIGTIME_ARRAY     = WAVEDESC+ 48
-aWAVE_ARRAY_1	    = WAVEDESC+ 60	# length (in Byte) of the sample array
-aINSTRUMENT_NAME    = WAVEDESC+ 76
-aINSTRUMENT_NUMBER  = WAVEDESC+ 92
-aTRACE_LABEL	    = WAVEDESC+ 96
-aWAVE_ARRAY_COUNT   = WAVEDESC+ 116
-aPNTS_PER_SECREEN   = WAVEDESC+ 120
-aFIRST_VALID_PNT    = WAVEDESC+ 124
-aLAST_VALID_PNT     = WAVEDESC+ 128
-aSEGMENT_INDEX      = WAVEDESC+ 140
-aSUBARRAY_COUNT     = WAVEDESC+ 144
-aNOM_SUBARRAY_COUNT = WAVEDESC+ 174
-aVERTICAL_GAIN	    = WAVEDESC+ 156
-aVERTICAL_OFFSET    = WAVEDESC+ 160
-aNOMINAL_BITS	    = WAVEDESC+ 172
-aHORIZ_INTERVAL     = WAVEDESC+ 176
-aHORIZ_OFFSET	    = WAVEDESC+ 180
-aVERTUNIT	    = WAVEDESC+ 196
-aHORUNIT	    = WAVEDESC+ 244
-aTRIGGER_TIME	    = WAVEDESC+ 296
-aACQ_DURATION       = WAVEDESC+ 312
-aRECORD_TYPE	    = WAVEDESC+ 316
-aPROCESSING_DONE    = WAVEDESC+ 318
-aTIMEBASE	    = WAVEDESC+ 324
-aVERT_COUPLING      = WAVEDESC+ 326
-aPROBE_ATT	    = WAVEDESC+ 328
-aFIXED_VERT_GAIN    = WAVEDESC+ 332
-aBANDWIDTH_LIMIT    = WAVEDESC+ 334
-aVERTICAL_VERNIER   = WAVEDESC+ 336
-aACQ_VERT_OFFSET    = WAVEDESC+ 340
-aWAVE_SOURCE	    = WAVEDESC+ 344
+aTEMPLATE_NAME	    = WAVEDESC+16
+aCOMM_TYPE	    = WAVEDESC+32
+aCOMM_ORDER	    = WAVEDESC+34
+aWAVE_DESCRIPTOR    = WAVEDESC+36	# length of the descriptor block
+aUSER_TEXT	    = WAVEDESC+40	# length of the usertext block
+aTRIGTIME_ARRAY     = WAVEDESC+48
+aWAVE_ARRAY_1	    = WAVEDESC+60	# length (in Byte) of the sample array
+aINSTRUMENT_NAME    = WAVEDESC+76
+aINSTRUMENT_NUMBER  = WAVEDESC+92
+aTRACE_LABEL	    = WAVEDESC+96
+aWAVE_ARRAY_COUNT   = WAVEDESC+116
+aPNTS_PER_SECREEN   = WAVEDESC+120
+aFIRST_VALID_PNT    = WAVEDESC+124
+aLAST_VALID_PNT     = WAVEDESC+128
+aSEGMENT_INDEX      = WAVEDESC+140
+aSUBARRAY_COUNT     = WAVEDESC+144
+aNOM_SUBARRAY_COUNT = WAVEDESC+174
+aVERTICAL_GAIN	    = WAVEDESC+156
+aVERTICAL_OFFSET    = WAVEDESC+160
+aNOMINAL_BITS	    = WAVEDESC+172
+aHORIZ_INTERVAL     = WAVEDESC+176
+aHORIZ_OFFSET	    = WAVEDESC+180
+aVERTUNIT	    = WAVEDESC+196
+aHORUNIT	    = WAVEDESC+244
+aTRIGGER_TIME	    = WAVEDESC+296
+aACQ_DURATION       = WAVEDESC+312
+aRECORD_TYPE	    = WAVEDESC+316
+aPROCESSING_DONE    = WAVEDESC+318
+aTIMEBASE	    = WAVEDESC+324
+aVERT_COUPLING      = WAVEDESC+326
+aPROBE_ATT	    = WAVEDESC+328
+aFIXED_VERT_GAIN    = WAVEDESC+332
+aBANDWIDTH_LIMIT    = WAVEDESC+334
+aVERTICAL_VERNIER   = WAVEDESC+336
+aACQ_VERT_OFFSET    = WAVEDESC+340
+aWAVE_SOURCE	    = WAVEDESC+344
 
 def dump_info(filepath_in, index_in,n_points):
     x_axis = []
@@ -149,7 +148,6 @@ def dump_info(filepath_in, index_in,n_points):
 
     my_file.seek(aTRIGGER_TIME)
     TRIGGER_TIME = struct.unpack('d',my_file.read(8))
-
     my_file.seek(aACQ_DURATION)
     ACQ_DURATION = struct.unpack('f',my_file.read(4))
 
@@ -259,26 +257,26 @@ def calc_horizontal_array(points_per_frame,horizontal_interval,horizontal_offset
     return x_axis
 
 runNumber = int(args.runNumber)
-print("\nProcessing run %i." % runNumber)
-
+print(f"\nProcessing run {runNumber}.")
 sourceFiles=[]
 inputFiles=[]
 start = time.time()
-for ic in range(1,nchan-1):#20GS/s
-	this_file = "%s/C%i--Trace%i.trc" % (RawDataPath, ic+1,runNumber)
-	if LocalMode: 
-		print("Copying files locally and moving originals to deletion folder.")
-		inputFiles.append("%s/C%i--Trace%i.trc" % (RawDataLocalCopyPath, ic+1,runNumber))
-		#print 'rsync -z -v %s %s && mv %s %s' % (this_file,RawDataLocalCopyPath,this_file,RawDataPath+"/to_delete/")
-		#os.system('rsync -z -v %s %s && mv %s %s' % (this_file,RawDataLocalCopyPath,this_file,RawDataPath+"/to_delete/"))
-		os.system('rsync -z -v %s %s && mv %s %s' % (this_file,RawDataLocalCopyPath,this_file,RawDataPath+"/to_delete/"))
 
-	else: inputFiles.append("C%i--Trace%i.trc" % (ic+1,runNumber)) ### condor copies files to current directory
+for ic in range(1, nchan - 1):  # 20GS/s
+    this_file = f"{RawDataPath}/C{ic + 1}--Trace{runNumber}.trc"
+    if LocalMode:
+        print("Copying files locally and moving originals to deletion folder.")
+        inputFiles.append(f"{RawDataLocalCopyPath}/C{ic + 1}--Trace{runNumber}.trc")
+        # print(f'rsync -z -v {this_file} {RawDataLocalCopyPath} && mv {this_file} {RawDataPath}/to_delete/')
+        # os.system(f'rsync -z -v {this_file} {RawDataLocalCopyPath} && mv {this_file} {RawDataPath}/to_delete/')
+        os.system(f'rsync -z -v {this_file} {RawDataLocalCopyPath} && mv {this_file} {RawDataPath}/to_delete/')
+    else:
+        inputFiles.append(f"C{ic + 1}--Trace{runNumber}.trc")  # condor copies files to current directory
 
 end = time.time()
-print("\nCopying files locally took %i seconds." % (end-start))
+print(f"\nCopying files locally took {end - start} seconds.")
+outputFile = f"{OutputFilePath}/converted_run{runNumber}.root"
 
-outputFile = "%s/converted_run%i.root"%(OutputFilePath, runNumber)
 #outputFile = "%s/run_scope%i.root"%(OutputFilePath, runNumber)
 
 #inputFile = "%s/C1--Trace--%05i.trc" %(RawDataPath,runNumber)  ### use ch1 to get information
@@ -297,16 +295,14 @@ for ichan in range(active_chan):#20GS/s
     vertical_gains.append(vertical_gain)
     vertical_offsets.append(vertical_offset)
 
-print("Number of segments: %i" %nsegments)
-print("Points per segment %i" % points_per_frame)
-print("Horizontal interval %s" % str(horizontal_interval))
-
+print(f"Number of segments: {nsegments}")
+print(f"Points per segment: {points_per_frame}")
+print(f"Horizontal interval: {horizontal_interval}")
 # for ichan in range(nchan):
 for ichan in range(active_chan):#20GS/s
-    print("Channel %i"%ichan)
-    print("\t vertical_gain %0.3f" % vertical_gains[ichan])
-    print("\t vertical offset %0.3f" % vertical_offsets[ichan])
-
+    print(f"Channel {ichan}")
+    print(f"\t vertical_gain {vertical_gains[ichan]:0.3f}")
+    print(f"\t vertical offset {vertical_offsets[ichan]:0.3f}")
 ### find beginning of trigger time block and y-axis block
 offset,full_offset = get_waveform_block_offset(inputFiles[0])
 #print "offset is ",offset
@@ -350,7 +346,7 @@ outTree.Branch('timeoffsets',time_offsets,'timeoffsets[8]/F')
 
 for i in range(nsegments):
     if i%1000==0:
-        print("Processing event %i" % i)
+        print(f"Processing event {i}")
     channel[0] = get_vertical_array(inputFiles[0],full_offset,points_per_frame,vertical_gains[0],vertical_offsets[0],i)
     channel[1] = get_vertical_array(inputFiles[1],full_offset,points_per_frame,vertical_gains[1],vertical_offsets[1],i)
     # channel[2] = get_vertical_array(inputFiles[2],full_offset,points_per_frame,vertical_gains[2],vertical_offsets[2],i)#20GS/s
@@ -378,8 +374,8 @@ outRoot.cd()
 outTree.Write()
 outRoot.Close()
 final = time.time()
-print("\nFilling tree took %i seconds." %(final-start))
-print("\nFull script duration: %0.f s"%(final-initial))
-
-if CopyToEOS: os.system("xrdcp -fs %s %s" %(outputFile,eosPath))
+print(f"\nFilling tree took {final - start} seconds.")
+print(f"\nFull script duration: {final - initial:.0f} s")
+if CopyToEOS: 
+    os.system(f"xrdcp -fs {outputFile} {eosPath}")
 # dump_info(inputFile,1,1000)

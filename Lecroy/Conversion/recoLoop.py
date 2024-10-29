@@ -1,13 +1,7 @@
 # def RecoAllScope(laserMode=False, LGADChannel=2, LGADThreshold=50):
 import time
-from datetime import datetime
-import getpass
 import os
-import subprocess
-import socket
-import sys
 import glob
-import shutil
 import ROOT
 import argparse
 
@@ -124,7 +118,6 @@ while True:
         os.system(f'mv /home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/ScopeData/LecroyRaw/C*--Trace{run}.trc /media/etl/Storage/SPS_October_2024/LecroyRaw/') # ADD THE BACKUP FOLDER
         os.system(f'mv {converted_path}/converted_run{run}.root /media/etl/Storage/SPS_October_2024/LecroyConverted/') # ADD THE BACKUP FOLDER
         os.system(f'mv {OutputFile}/media/etl/Storage/SPS_October_2024/LecroyTimingDAQ/run_scope{run}.root')
-        
         print(run)
 
         # #Here making a link from the ScopeData directory to the backup
@@ -138,5 +131,4 @@ while True:
             f.write("True")
             f.truncate()
             f.close()
-
     time.sleep(2)

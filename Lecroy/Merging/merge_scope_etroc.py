@@ -1,5 +1,4 @@
 import uproot
-import numpy as np
 import awkward as ak
 from awkward.highlevel import Array as akArray
 import time
@@ -9,7 +8,6 @@ from clock import calc_clock
 import file_status
 
 BASE_DATA_DIR   = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler"
-
 # INPUT DATA PATHS
 RECO_DATA_PATH  = lambda run_num: f"{BASE_DATA_DIR}/ScopeData/LecroyConverted/converted_run{run_num}.root"
 SCOPE_DATA_PATH = lambda run_num: f"{BASE_DATA_DIR}/ScopeData/LecroyTimingDAQ/run_scope{run_num}.root"
@@ -134,5 +132,4 @@ if __name__ == "__main__":
         else:
             run_number += 1 
             file_not_found_cntr += 1
-
         print('')
