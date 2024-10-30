@@ -1,34 +1,7 @@
 ### if sample rate or horizontal window is changed, TimingDAQ must be recompiled to account for new npoints.
 import os
 import argparse
-# sampleRate = 1000 #GSa/s ### not sure if works for Lecroy
-# sampleRate = 10 #GSa/s ### not sure if works for Lecroy
-sampleRate = 20 #GSa/s ### not sure if works for Lecroy
-horizontalWindow = 50 #ns
-# horizontalWindow = 40 #ns
-# horizontalWindow = 25 # ns
-# horizontalWindow = 12.5 #ns
 
-#Hard Code these:
-trigCh="C2" #"EX" ## or "C{N}" or "EX"
-trig= -0.3 # -0.04 ## -0.01 V
-
-vScale1 = 0.2
-vScale2 = 0.2 
-vScale3 = 0.2 
-vScale4 = 0.2 
-# vScale5 = 0.05 
-# vScale6 = 0.10
-# vScale7 = 0.50
-# vScale8 = 0.50
-vPos1 = 0
-vPos2 = 3
-vPos3 = -3
-vPos4 = 0
-
-trigSlope = "NEG"
-timeoffset = 0 #ns
-# timeoffset = 12.5 #ns
 runNumber = -1 ### -1 means use serial number
 ScopeControlDir = "/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy"
 
@@ -64,7 +37,18 @@ if __name__ == "__main__":
     argParser = argparse.ArgumentParser(description = "Argument parser")
     argParser.add_argument("--force_acquisition",action="store_true")
     argParser.add_argument("--nevents",action="store")
+    argParser.add_argument("--sample_rate",action="store")
+    argParser.add_argument("--horizontal_window",action="store")
+    argParser.add_argument("--trigger_channel",action="store")
+    argParser.add_argument("--trigger",action="store")
+    argParser.add_argument("--v_scale_2",action="store")
+    argParser.add_argument("--v_scale_3",action="store")
+    argParser.add_argument("--v_position_2",action="store")
+    argParser.add_argument("--v_position_3",action="store")
+    argParser.add_argument("--time_offset",action="store")
+    argParser.add_argument("--trigger_slope",action="store")
     args = argParser.parse_args()
+
     with open("/home/etl/Test_Stand/ETL_TestingDAQ/module_test_sw/running_ETROC_acquisition.txt") as file:
         kcu_acquisition_flag = file.read()
     
@@ -83,6 +67,17 @@ if __name__ == "__main__":
         f.truncate()
 
     numEvents = int(args.nevents)
+    sampleRate = int(args.sampleRate)
+    horizontalWindow = float(args.horizontalWindow)
+    trigCh = string(args.trigCh)
+    trig = float(args.trig)
+    vScale2 = float(args.vScale2)
+    vScale3 = float(args.vScale3)
+    vPos2 = float(args.vPos2)
+    vPos3 = float(args.vPos3)
+    timeoffset = float(timeoffset)
+    trigSlope = float(trigSlope)
+    
     ScopeAcquisition(numEvents)
 
     with open("/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Acquisition/running_acquisition.txt", "w") as f:
@@ -92,4 +87,3 @@ if __name__ == "__main__":
     with open("/home/etl/Test_Stand/ETL_TestingDAQ/ScopeHandler/Lecroy/Acquisition/merging.txt", "w") as f:
         f.write("True")
         f.truncate()
-
