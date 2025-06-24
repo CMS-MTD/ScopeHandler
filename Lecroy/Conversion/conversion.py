@@ -6,7 +6,7 @@ import optparse
 import argparse
 import os
 import sys
-
+import subprocess
 nchan=8
 
 parser = argparse.ArgumentParser(description='Run info.')
@@ -17,7 +17,8 @@ initial = time.time()
 
 RawDataPath = ""
 RawDataLocalCopyPath = ""
-BasePath = "2024_05_SNSPD_FCFD_ETL"
+BASE_PATH = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8') 
+BasePath = BASE_PATH.split('/')[-2]
 OutputFilePath = "/home/daq/%s/LecroyScope/RecoData/ConversionRECO/" % BasePath
 eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/%s/LecroyScope/RecoData/ConversionRECO/"  % BasePath
 

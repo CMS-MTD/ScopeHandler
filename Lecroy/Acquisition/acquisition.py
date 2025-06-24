@@ -10,6 +10,7 @@ import datetime
 from shutil import copy
 import visa
 import glob
+import subprocess
 
 """#################SEARCH/CONNECT#################"""
 # establish communication with scope
@@ -19,12 +20,13 @@ lecroy = rm.open_resource('TCPIP0::192.168.133.169::INSTR')
 lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
+BASE_PATH = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
 
-run_log_path = "/home/daq/2024_05_SNSPD_FCFD_ETL/ScopeHandler/Lecroy/Acquisition/RunLog.txt"
+run_log_path = BASE_PATH + "/Lecroy/Acquisition/RunLog.txt"
 
 
 def GetNextNumber():
-    run_num_file = "/home/daq/2024_05_SNSPD_FCFD_ETL/ScopeHandler/Lecroy/Acquisition/next_run_number.txt"
+    run_num_file = BASE_PATH + "/Lecroy/Acquisition/next_run_number.txt"
     FileHandle = open(run_num_file)
     nextNumber = int(FileHandle.read().strip())
     FileHandle.close()

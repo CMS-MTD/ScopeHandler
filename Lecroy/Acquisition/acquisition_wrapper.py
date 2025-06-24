@@ -1,6 +1,8 @@
 ### if sample rate or horizontal window is changed, TimingDAQ must be recompiled to account for new npoints.
 import sys
 import os
+import subprocess
+
 
 sampleRate = 10#GSa/s ### not sure if works for Lecroy
 horizontalWindow = 200 #ns
@@ -27,7 +29,8 @@ timeoffset = -100 #ns
 runNumber = -1 ### -1 means use serial number
 
 
-ScopeControlDir = "/home/daq/2024_05_SNSPD_FCFD_ETL/ScopeHandler/Lecroy/"
+BASE_PATH = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
+ScopeControlDir = BASE_PATH + "ScopeHandler/Lecroy/"
 
 def ScopeAcquisition(numEvents):
 
