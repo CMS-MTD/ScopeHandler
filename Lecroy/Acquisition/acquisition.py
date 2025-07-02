@@ -16,12 +16,12 @@ import subprocess
 # establish communication with scope
 initial = time.time()
 rm = visa.ResourceManager("@py")
-lecroy = rm.open_resource('TCPIP0::192.168.133.169::INSTR')
+lecroy = rm.open_resource('TCPIP0::192.168.0.12::INSTR')
 lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
 BASE_PATH = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
-
+BASE_PATH = "/home/daq/2025_08_SNSPD/ScopeHandler/"
 run_log_path = BASE_PATH + "/Lecroy/Acquisition/RunLog.txt"
 
 
