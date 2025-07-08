@@ -100,7 +100,6 @@ lecroy.write("COMM_HEADER OFF")
 if args.display == 0: lecroy.write("DISPLAY OFF")
 else: lecroy.write("DISPLAY ON")
 
-
 ####### Vertical setup ######
 
 vScales_in_mV = []
@@ -125,6 +124,7 @@ vOffsets_in_mV.append(int(1000* args.vScale8 * args.vPos8))
 print "Vertical setup."
 for chan in range(1,nchan+1):
 	print "\tChannel %i: %i mV/div, %i mV offset. "% (chan, vScales_in_mV[chan-1],vOffsets_in_mV[chan-1])
+	lecroy.write("C%i:TRA ON"%(chan))
 	lecroy.write("C%i:COUPLING D50"%(chan))
 	lecroy.write("C%i:VOLT_DIV %iMV"%(chan, vScales_in_mV[chan-1]))
 	lecroy.write("C%i:OFFSET %iMV"%(chan, vOffsets_in_mV[chan-1]))
