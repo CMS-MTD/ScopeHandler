@@ -15,7 +15,7 @@ import glob
 # establish communication with scope
 initial = time.time()
 rm = visa.ResourceManager("@py")
-lecroy = rm.open_resource('TCPIP0::192.168.133.169::INSTR')
+lecroy = rm.open_resource('TCPIP0::192.168.0.12::INSTR')
 lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
