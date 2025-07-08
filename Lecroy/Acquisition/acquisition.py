@@ -20,7 +20,7 @@ lecroy = rm.open_resource('TCPIP0::192.168.0.12::INSTR')
 lecroy.timeout = 3000000
 lecroy.encoding = 'latin_1'
 lecroy.clear()
-BASE_PATH = "/home/daq/2025_08_SNSPD/ScopeHandler/"
+BASE_PATH = "/home/daq/2025_07_FCFD/ScopeHandler/"
 run_log_path = BASE_PATH + "/Lecroy/Acquisition/RunLog.txt"
 
 
@@ -69,6 +69,8 @@ parser.add_argument('--display',metavar='display', type=int, default= 0, help='e
 
 
 parser.add_argument('--timeoffset',metavar='timeoffset', type=float, default=0, help='Offset to compensate for trigger delay. This is the delta T between the center of the acquisition window and the trigger. (default for NimPlusX: -160 ns)',required=False)
+parser.add_argument('--holdoff',metavar='holdoff', type=float, default=0, help='trigger hold off time in units of ns, default is 0',required=False)
+parser.add_argument('--auxOutPulseWidth',metavar='args.auxOutPulseWidth', type=float, default=0, help='Aux Output Pulse Width',required=False)
 
 # parser.add_argument('--save',metavar='save', type=int, default= 1, help='Save waveforms',required=False)
 # parser.add_argument('--timeout',metavar='timeout', type=float, default= -1, help='Max run duration [s]',required=False)
@@ -148,13 +150,25 @@ print "Setting horizontal offset 50 %i ns" %args.timeoffset
 lecroy.write("TRIG_DELAY %i ns"%args.timeoffset)
 
 
-####### Trigger setup ######
-lecroy.write("TRIG_SELECT Edge,SR,%s"%args.trigCh)
+####### Trigger setup #####
+if args.holdoff > 0: lecroy.write("TRIG_SELECT Edge,SR,%s,HT,TI,HV,%0.3f NS"% (args.trigCh, args.holdoff))
+else:lecroy.write("TRIG_SELECT Edge,SR,%s, HT, OFF" % args.trigCh) 
+print("\nTrigger holdoff time is %0.3f ns" % args.holdoff)
 if args.trigCh != "LINE":
 	lecroy.write("%s:TRLV %0.3fV"%(args.trigCh,args.trig))
 	lecroy.write("TRIG_SLOPE %s" %args.trigSlope)
 
-print "\nTriggering on %s with %0.3fV threshold, %s polarity." %(args.trigCh,args.trig,args.trigSlope)
+print "Triggering on %s with %0.3fV threshold, %s polarity." %(args.trigCh,args.trig,args.trigSlope)
+
+####### Trigger Aux Out Setup ######
+if args.auxOutPulseWidth > 0:
+	lecroy.write(r"""vbs 'app.Acquisition.AuxOutput.AuxMode = "TriggerOut"' """)
+	lecroy.write(r"""vbs 'app.Acquisition.AuxOutput.TrigOutPulseWidth = "%d ns"' """ % args.auxOutPulseWidth)
+	print("Trigger Aux Output Pulse Width: %d ns" % args.auxOutPulseWidth)
+else:
+	lecroy.write(r"""vbs 'app.Acquisition.AuxOutput.AuxMode = "Off"' """)
+	print("No Trigger Aux Output Set")
+
 
 #lecroy.write("TRIG_SELECT Edge,SR,LINE")
 #lecroy.write("TRIG_SELECT Edge,SR,EX")
