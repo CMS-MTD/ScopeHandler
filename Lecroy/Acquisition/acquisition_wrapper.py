@@ -8,7 +8,8 @@ sampleRate = 10#GSa/s ### not sure if works for Lecroy
 horizontalWindow = 200 #ns
 
 #Hard Code these:
-trigCh="EX" ## or "C{N}" or "EX"
+#trigCh="EX" ## or "C{N}" or "EX"
+trigCh="C1" ## or "C{N}" or "EX"
 trig= 0.45 ## -0.01 V
 
 vScale1 = 0.03
@@ -34,12 +35,12 @@ ScopeControlDir = BASE_PATH + "ScopeHandler/Lecroy/"
 
 def ScopeAcquisition(numEvents):
 
-	print "\n ####################### Running the scope acquisition ##################################\n"
+	print("\n ####################### Running the scope acquisition ##################################\n")
 	#ScopeCommand = 'python %sAcquisition/acquisition.py --runNum %s --numEvents %d --sampleRate %d --horizontalWindow %d --trigCh %s --trig %f --vScale1 %f --vScale2 %f --vScale3 %f --vScale4 %f --timeoffset %i --trigSlope %s' % (ScopeControlDir,RunNumber, NumEvents, sampleRate, horizontalWindow, trigCh, trig, vScale1, vScale2, vScale3, vScale4, timeoffset, trigSlope) 
 	ScopeCommand = 'python %s/Acquisition/acquisition.py --runNum %s --numEvents %d --sampleRate %d --horizontalWindow %d --trigCh %s --trig %f --vScale1 %f --vScale2 %f --vScale3 %f --vScale4 %f --vScale5 %f --vScale6 %f --vScale7 %f --vScale8 %f --vPos7 %f --vPos8 %f --timeoffset %i --trigSlope %s --display 0' % (ScopeControlDir,runNumber, numEvents, sampleRate, horizontalWindow, trigCh, trig, vScale1, vScale2, vScale3, vScale4,vScale5, vScale6, vScale7, vScale8, vPos7, vPos8, timeoffset,trigSlope) 
 
 
-	print ScopeCommand
+	print(ScopeCommand)
 	os.system(ScopeCommand)
 		    
 

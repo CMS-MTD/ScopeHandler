@@ -38,7 +38,7 @@ rm = pyvisa.ResourceManager("@py")
 dpo = rm.open_resource('TCPIP::192.168.200.159::INSTR')
 dpo.timeout = 3000000
 dpo.encoding = 'latin_1'
-print(dpo.query('*idn?'))
+print((dpo.query('*idn?')))
 
 parser = argparse.ArgumentParser(description='Run info.')
 
@@ -69,12 +69,12 @@ if trigCh != "AUX": trigCh = 'CHANnel'+trigCh
 trigLevel = float(args.trig)
 triggerSlope = args.trigSlope
 timeoffset = float(args.timeoffset)*1e-9
-print("timeoffset is ",timeoffset)
+print(("timeoffset is ",timeoffset))
 date = datetime.datetime.now()
 savewaves = int(args.save)
 timeout = float(args.timeout)
 print(savewaves)
-print("timeout is ",timeout)
+print(("timeout is ",timeout))
 """#################CONFIGURE INSTRUMENT#################"""
 # variables for individual settings
 hScale = float(args.horizontalWindow)*1e-9
@@ -107,7 +107,7 @@ if runNumberParam == -1:
 	RunNumberFile = '/home/daq/etltest_0721/otsdaq_runNumber.txt'
 	with open(RunNumberFile) as file:
 	    runNumber = int(file.read())
-	print('######## Starting RUN {} ########\n'.format(runNumber))
+	print(('######## Starting RUN {} ########\n'.format(runNumber)))
 	print('---------------------\n')
 	print(date)
 	print('---------------------\n')
@@ -143,7 +143,7 @@ dpo.write(':TIMebase:RANGe {}'.format(hScale)) ## Sets the full-scale horizontal
 dpo.write(':TIMebase:REFerence:PERCent 50') ## percent of screen location
 dpo.write(':ACQuire:SRATe:ANALog {}'.format(samplingrate))
 #dpo.write(':TIMebase:POSition 25E-9') ## offset
-print(':TIMebase:POSition {}'.format(timeoffset))
+print((':TIMebase:POSition {}'.format(timeoffset)))
 dpo.write(':TIMebase:POSition {}'.format(timeoffset)) ## offset
 dpo.write(':ACQuire:MODE SEGMented') ## fast frame/segmented acquisition mode
 dpo.write(':ACQuire:SEGMented:COUNt {}'.format(numEvents)) ##number of segments to acquire
@@ -151,7 +151,7 @@ dpo.write(':ACQuire:POINts:ANALog {}'.format(numPoints))
 dpo.write(':ACQuire:INTerpolate 0') ## interpolation is set off (otherwise its set to auto, which cause errors downstream)
 
 print("# SCOPE HORIZONTAL SETUP #")
-print('Horizontal scale set to {} for division\n'.format(hScale))
+print(('Horizontal scale set to {} for division\n'.format(hScale)))
 
 logf.write("HORIZONTAL SETUP\n")
 logf.write('- Horizontal scale set to {} s for division\n\n'.format(hScale))
@@ -195,7 +195,7 @@ dpo.write(':TRIGger:EDGE:SLOPe %s;' %(triggerSlope))
 
 trigprint='%.3f'%(trigLevel)
 print("# TRIGGER SETUP #")
-print('Trigger scale set to %s V\n'%(trigprint))
+print(('Trigger scale set to %s V\n'%(trigprint)))
 
 logf.write("TRIGGER SETUP\n")
 logf.write('- Trigger Channel set to %s\n'%(trigCh))
@@ -220,7 +220,7 @@ time.sleep(2)
 #dpo.write(':DIGitize')
 #print ("digitize")
 
-print(dpo.write(':CDISplay'))
+print((dpo.write(':CDISplay')))
 
 dpo.write('*CLS;:SINGle')
 start = time.time()
@@ -252,37 +252,37 @@ tmp_file.close()
 duration = end - start
 trigRate = float(numEvents)/duration
 
-if not end_early: print("\nRun duration: %0.2f s. Trigger rate: %.2f Hz\n" % (duration,trigRate))
-else: print("\nRun duration: %0.2f s. Trigger rate: unknown\n" % (duration) )
+if not end_early: print(("\nRun duration: %0.2f s. Trigger rate: %.2f Hz\n" % (duration,trigRate)))
+else: print(("\nRun duration: %0.2f s. Trigger rate: unknown\n" % (duration) ))
 if savewaves: 
 	dpo.write(':DISK:SEGMented ALL') ##save all segments (as opposed to just the current segment)
-	print(dpo.query('*OPC?'))
+	print((dpo.query('*OPC?')))
 	print("Ready to save all segments")
 	time.sleep(0.5)
 	dpo.write(':DISK:SAVE:WAVeform CHANnel1 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH1_%s",BIN,ON'%(runNumber))
 	#dpo.write(':DISK:SAVE:WAVeform CHANnel1 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH1_test_4000events",BIN,ON')
 
-	print(dpo.query('*OPC?'))
+	print((dpo.query('*OPC?')))
 	print("Saved Channel 1 waveform")
 	time.sleep(1)
 	dpo.write(':DISK:SAVE:WAVeform CHANnel2 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH2_%s",BIN,ON'%(runNumber))
 	#dpo.write(':DISK:SAVE:WAVeform CHANnel2 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH2_test_4000events",BIN,ON')
 
-	print(dpo.query('*OPC?'))
+	print((dpo.query('*OPC?')))
 	print("Saved Channel 2 waveform")
 	time.sleep(1)
 
 	dpo.write(':DISK:SAVE:WAVeform CHANnel3 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH3_%s",BIN,ON'%(runNumber))
 	#dpo.write(':DISK:SAVE:WAVeform CHANnel3 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH3_test_4000events",BIN,ON')
 
-	print(dpo.query('*OPC?'))
+	print((dpo.query('*OPC?')))
 	print("Saved Channel 3 waveform")
 	time.sleep(1)
 
 	dpo.write(':DISK:SAVE:WAVeform CHANnel4 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH4_%s",BIN,ON'%(runNumber))
 	#dpo.write(':DISK:SAVE:WAVeform CHANnel4 ,"C:\\Users\\Public\\Documents\\AgilentWaveform\\Wavenewscope_CH4_test_4000events",BIN,ON')
 
-	print(dpo.query('*OPC?'))
+	print((dpo.query('*OPC?')))
 	print("Saved Channel 4 waveform")
 else: print("Skipping saving step.")
 tmp_file2 = open(run_log_path,"w")

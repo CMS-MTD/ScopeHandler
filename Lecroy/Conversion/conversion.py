@@ -16,8 +16,8 @@ initial = time.time()
 
 RawDataPath = ""
 RawDataLocalCopyPath = ""
-BasePath = "2025_08_SNSPD"
-OutputFilePath = "/home/daq/%s/LecroyScope/RecoData/ConversionRECO/" % BasePath
+BasePath = "2026_05_SNSPD"
+OutputFilePath = "/home/snspd/%s/LecroyScope/RecoData/ConversionRECO/" % BasePath
 eosPath = "root://cmseos.fnal.gov//store/group/cmstestbeam/%s/LecroyScope/RecoData/ConversionRECO/"  % BasePath
 
 LocalMode=True
@@ -34,7 +34,7 @@ else:
     except:
         print("Failed to find environment")
     if isLPC:
-        print("Found user: {} Running on LPC: {}".format(user, isLPC))
+        print(("Found user: {} Running on LPC: {}".format(user, isLPC)))
         LocalMode = False
 if LocalMode:
 	RawDataPath = "/home/daq/LecroyMount/"
@@ -98,10 +98,10 @@ def dump_info(filepath_in, index_in,n_points):
 	#print WAVEDESC
 	my_file.seek(aCOMM_ORDER)
 	comm_order = struct.unpack('h',my_file.read(2))
-	print("Comm order",comm_order)
+	print(("Comm order",comm_order))
 	my_file.seek(aCOMM_TYPE)
 	comm_type = struct.unpack('h',my_file.read(2))
-	print("Comm type",comm_type)
+	print(("Comm type",comm_type))
 
 	my_file.seek(WAVEDESC+16)
 	template_name= my_file.read(16)
@@ -112,30 +112,30 @@ def dump_info(filepath_in, index_in,n_points):
 	print(instrument_name)
 
 	my_file.seek(aWAVE_SOURCE)
-	print("Wave source index is ",struct.unpack('h',my_file.read(2)))
+	print(("Wave source index is ",struct.unpack('h',my_file.read(2))))
 	my_file.seek(aVERT_COUPLING)
-	print("Vert coupling index is ",struct.unpack('h',my_file.read(2)))
+	print(("Vert coupling index is ",struct.unpack('h',my_file.read(2))))
 	my_file.seek(aBANDWIDTH_LIMIT)
-	print("Bandwith limiting index is ",struct.unpack('h',my_file.read(2)))
+	print(("Bandwith limiting index is ",struct.unpack('h',my_file.read(2))))
 	my_file.seek(aRECORD_TYPE)
-	print("Record type index is ",struct.unpack('h',my_file.read(2)))
+	print(("Record type index is ",struct.unpack('h',my_file.read(2))))
 	my_file.seek(aVERTICAL_GAIN)
 	vertical_gain = struct.unpack('f',my_file.read(4))[0]
-	print("Vertical gain is ",vertical_gain)
+	print(("Vertical gain is ",vertical_gain))
 	my_file.seek(aVERTICAL_OFFSET)
-	print("Vertical offset is ",struct.unpack('f',my_file.read(4)))
+	print(("Vertical offset is ",struct.unpack('f',my_file.read(4))))
 	my_file.seek(aFIXED_VERT_GAIN)
-	print("Fixed vertical gain index is",struct.unpack('h',my_file.read(2)))
+	print(("Fixed vertical gain index is",struct.unpack('h',my_file.read(2))))
 	my_file.seek(aNOMINAL_BITS)
-	print("Nominal bits is ",struct.unpack('h',my_file.read(2)))
+	print(("Nominal bits is ",struct.unpack('h',my_file.read(2))))
 	my_file.seek(aHORIZ_INTERVAL)
-	print("Horizontal interval is ",struct.unpack('f',my_file.read(4)))	
+	print(("Horizontal interval is ",struct.unpack('f',my_file.read(4))))	
 	my_file.seek(aHORIZ_OFFSET)
-	print("Horizontal offset is ",struct.unpack('d',my_file.read(8)))	
+	print(("Horizontal offset is ",struct.unpack('d',my_file.read(8))))	
 
 	my_file.seek(aWAVE_DESCRIPTOR)
 	wave_descriptor = struct.unpack('i',my_file.read(4))
-	print("descriptor is ",wave_descriptor)
+	print(("descriptor is ",wave_descriptor))
 
 	my_file.seek(aUSER_TEXT)
 	USER_TEXT			= struct.unpack('i',my_file.read(4))#ReadLong(fid, aUSER_TEXT);
@@ -152,10 +152,10 @@ def dump_info(filepath_in, index_in,n_points):
 	SEGMENT_INDEX      = struct.unpack('i',my_file.read(4))
 	my_file.seek(aSUBARRAY_COUNT)
 	SUBARRAY_COUNT      = struct.unpack('i',my_file.read(4))
-	print("Actual segment count: ",SUBARRAY_COUNT)
+	print(("Actual segment count: ",SUBARRAY_COUNT))
 	my_file.seek(aNOM_SUBARRAY_COUNT)
 	NOM_SUBARRAY_COUNT      = struct.unpack('h',my_file.read(2))
-	print("Target segment count: ",NOM_SUBARRAY_COUNT)
+	print(("Target segment count: ",NOM_SUBARRAY_COUNT))
 
 	my_file.seek(aTRIGGER_TIME)
 	TRIGGER_TIME      = struct.unpack('d',my_file.read(8))
@@ -163,22 +163,22 @@ def dump_info(filepath_in, index_in,n_points):
 	my_file.seek(aACQ_DURATION)
 	ACQ_DURATION      = struct.unpack('f',my_file.read(4))
 
-	print("User text ",USER_TEXT)
-	print("Wave array",WAVE_ARRAY_1)
-	print("Wave array count",WAVE_ARRAY_COUNT)
-	print("PNTS_PER_SCREEN",PNTS_PER_SCREEN)
-	print("Trig time array",TRIGTIME_ARRAY)
-	print("Segment index",SEGMENT_INDEX)
-	print("Trigger time,",TRIGGER_TIME)
-	print("Acquisition duration",ACQ_DURATION)
+	print(("User text ",USER_TEXT))
+	print(("Wave array",WAVE_ARRAY_1))
+	print(("Wave array count",WAVE_ARRAY_COUNT))
+	print(("PNTS_PER_SCREEN",PNTS_PER_SCREEN))
+	print(("Trig time array",TRIGTIME_ARRAY))
+	print(("Segment index",SEGMENT_INDEX))
+	print(("Trigger time,",TRIGGER_TIME))
+	print(("Acquisition duration",ACQ_DURATION))
 
 	my_file.seek(aFIRST_VALID_PNT)
 	FIRST_VALID_PNT = struct.unpack("i",my_file.read(4))
 
 	my_file.seek(aLAST_VALID_PNT)
 	LAST_VALID_PNT = struct.unpack("i",my_file.read(4))
-	print("First point ",FIRST_VALID_PNT)
-	print("LAST point ",LAST_VALID_PNT)
+	print(("First point ",FIRST_VALID_PNT))
+	print(("LAST point ",LAST_VALID_PNT))
 	# b_y_data = my_file.read(WAVE_ARRAY_1[0])
 	# exit
 	offset = WAVEDESC + wave_descriptor[0] + USER_TEXT[0] #+ TRIGTIME_ARRAY[0]
@@ -194,12 +194,12 @@ def dump_info(filepath_in, index_in,n_points):
 	time_event3      = struct.unpack('d',my_file.read(8))
 	offset_event3      = struct.unpack('d',my_file.read(8))
 
-	print("time event 1 ",time_event1)
-	print("offset event 1 ",offset_event1)
-	print("time event 2 ",time_event2)
-	print("offset event 2 ",offset_event2)
-	print("time event 3 ",time_event3)
-	print("offset event 3 ",offset_event3)
+	print(("time event 1 ",time_event1))
+	print(("offset event 1 ",offset_event1))
+	print(("time event 2 ",time_event2))
+	print(("offset event 2 ",offset_event2))
+	print(("time event 3 ",time_event3))
+	print(("offset event 3 ",offset_event3))
 
 
 	my_file.seek(offset + TRIGTIME_ARRAY[0])
@@ -280,7 +280,7 @@ def calc_horizontal_array(points_per_frame,horizontal_interval,horizontal_offset
 
 
 runNumber = int(args.runNumber)
-print("\nProcessing run %i." % runNumber)
+print(("\nProcessing run %i." % runNumber))
 
 sourceFiles=[]
 inputFiles=[]
@@ -296,7 +296,7 @@ for ic in range(nchan):
 	else: inputFiles.append("C%i--Trace%i.trc" % (ic+1,runNumber)) ### condor copies files to current directory
 
 end = time.time()
-print("\nCopying files locally took %i seconds." % (end-start))
+print(("\nCopying files locally took %i seconds." % (end-start)))
 
 outputFile = "%sconverted_run%i.root"%(OutputFilePath, runNumber)
 #outputFile = "%srun_scope%i.root"%(OutputFilePath, runNumber)
@@ -314,14 +314,14 @@ for ichan in range(nchan):
 	vertical_gains.append(vertical_gain)
 	vertical_offsets.append(vertical_offset)
 
-print("Number of segments: %i" %nsegments)
-print("Points per segment %i" % points_per_frame)
-print("Horizontal interval %s" % str(horizontal_interval))
+print(("Number of segments: %i" %nsegments))
+print(("Points per segment %i" % points_per_frame))
+print(("Horizontal interval %s" % str(horizontal_interval)))
 
 for ichan in range(nchan):
-	print("Channel %i"%ichan)
-	print("\t vertical_gain %0.3f" % vertical_gains[ichan])
-	print("\t vertical offset %0.3f" % vertical_offsets[ichan])
+	print(("Channel %i"%ichan))
+	print(("\t vertical_gain %0.3f" % vertical_gains[ichan]))
+	print(("\t vertical offset %0.3f" % vertical_offsets[ichan]))
 
 ### find beginning of trigger time block and y-axis block
 offset,full_offset = get_waveform_block_offset(inputFiles[0])
@@ -365,7 +365,7 @@ outTree.Branch('timeoffsets',time_offsets,'timeoffsets[8]/F')
 
 for i in range(nsegments):
     if i%1000==0:
-        print("Processing event %i" % i)
+        print(("Processing event %i" % i))
     channel[0] = get_vertical_array(inputFiles[0],full_offset,points_per_frame,vertical_gains[0],vertical_offsets[0],i)
     channel[1] = get_vertical_array(inputFiles[1],full_offset,points_per_frame,vertical_gains[1],vertical_offsets[1],i)
     channel[2] = get_vertical_array(inputFiles[2],full_offset,points_per_frame,vertical_gains[2],vertical_offsets[2],i)
@@ -393,7 +393,7 @@ outRoot.cd()
 outTree.Write()
 outRoot.Close()
 final = time.time()
-print("\nFilling tree took %i seconds." %(final-start))
-print("\nFull script duration: %0.f s"%(final-initial))
+print(("\nFilling tree took %i seconds." %(final-start)))
+print(("\nFull script duration: %0.f s"%(final-initial)))
 
 if CopyToEOS: os.system("xrdcp -fs %s %s" %(outputFile,eosPath))

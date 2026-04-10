@@ -49,20 +49,20 @@ while True:
         RecoPath = '%s/converted_run_scope%i.root' % (converted_path,run)
         RawPath = 'Wavenewscope_CH4_%i.bin' % run
 
-        print 'lsof -f --/home/daq/ScopeMount//%s | grep -Eoi %s' % (RawPath, RawPath)
+        print('lsof -f --/home/daq/ScopeMount//%s | grep -Eoi %s' % (RawPath, RawPath))
         if os.path.exists(RecoPath):
-            print 'Run %i already converted. Doing reco stage two' % run
+            print('Run %i already converted. Doing reco stage two' % run)
         elif not os.popen('lsof -f -- /home/daq/ScopeMount//%s |grep -Eoi %s' % (RawPath, RawPath)).read().strip() == RawPath:
-            print 'Converting run ', run
+            print('Converting run ', run)
             #ConversionCmd = "python /home/daq/etltest_0721/Scope/ScopeHandler/KeySight/Conversion/conversion_bin_fast.py --Run %i" % (run)
             ConversionCmd = "/home/daq/etltest_0721/Scope/ScopeHandler/KeySight/Conversion/conversion_bin.sh %i" % (run)
             os.system(ConversionCmd)
 
-        print 'Doing dattoroot for run %i' % run               
+        print('Doing dattoroot for run %i' % run)               
         OutputFile = '%s/run_scope%i.root' % (reco_path, run)
         DattorootCmd = '/home/daq/etltest_0721/Scope/TimingDAQ/NetScopeStandaloneDat2Root --input_file=%s/run_scope%i.root --output_file=%s --config=//home/daq/etltest_0721/Scope/TimingDAQ/config/KeySight_BetaSource.config --save_meas'  % (converted_path,run,OutputFile)
 
-        print DattorootCmd
+        print(DattorootCmd)
         os.system(DattorootCmd)
         
         #CoincRate, EntriesWithLGADHits, TotalEntries = RunEntriesScope(OutputFile, LGADChannels, Threshold) # lgad channel starting from zero 

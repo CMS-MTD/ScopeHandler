@@ -21,7 +21,7 @@ lecroy.encoding = 'latin_1'
 lecroy.clear()
 
 
-print "\n \nPreparing 8-channel scope. \n"
+print("\n \nPreparing 8-channel scope. \n")
 lecroy.write('STOP')
 lecroy.write("*CLS")
 lecroy.write("COMM_HEADER OFF")
@@ -48,9 +48,9 @@ vOffsets_in_mV.append(int(1000* 0.01 * 0. ))
 vOffsets_in_mV.append(int(1000* 0.01 * -1))
 vOffsets_in_mV.append(int(1000* 0.01 * -2))
 vOffsets_in_mV.append(int(1000* 0.01 * -3 ))
-print "Vertical setup."
+print("Vertical setup.")
 for chan in range(1,8+1):
-	print "\tChannel %i: %i mV/div, %i mV offset. "% (chan, vScales_in_mV[chan-1],vOffsets_in_mV[chan-1])
+	print("\tChannel %i: %i mV/div, %i mV offset. "% (chan, vScales_in_mV[chan-1],vOffsets_in_mV[chan-1]))
 	lecroy.write("C%i:COUPLING D50"%(chan))
 	lecroy.write("C%i:VOLT_DIV %iMV"%(chan, vScales_in_mV[chan-1]))
 	lecroy.write("C%i:OFFSET %iMV"%(chan, vOffsets_in_mV[chan-1]))
