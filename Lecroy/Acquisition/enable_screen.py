@@ -21,7 +21,7 @@ lecroy.encoding = 'latin_1'
 lecroy.clear()
 
 
-print "\n \nPreparing 8-channel scope. \n"
+print("\n \nPreparing 8-channel scope. \n")
 lecroy.write('STOP')
 lecroy.write("*CLS")
 lecroy.write("COMM_HEADER OFF")

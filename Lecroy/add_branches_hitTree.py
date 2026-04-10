@@ -12,7 +12,7 @@ infoInputDir = "/home/daq/SurvivalBeam2021/ConfigInfo/Runs/"
 
 condorMode=False
 if os.path.exists("_condor_stdout"):
-    print "Detected condor"
+    print("Detected condor")
     condorMode=True
     hitTreeInputDir=""
     infoInputDir=""
@@ -66,14 +66,14 @@ def processRun(runNumber,outfileName,infoDict):
             v_col.push_back(-1)
 
 
-    print "sensors"
-    for sensor in v_sensors: print sensor
-    print "pads"
-    for pad in v_padnum: print pad
-    print "mux"
-    for mux in v_mux: print mux
-    print "col"
-    for col in v_col: print col
+    print("sensors")
+    for sensor in v_sensors: print(sensor)
+    print("pads")
+    for pad in v_padnum: print(pad)
+    print("mux")
+    for mux in v_mux: print(mux)
+    print("col")
+    for col in v_col: print(col)
 
     # for x in sensors: v_sensors.push_back(x)
     # v_pads = vector('int')()
@@ -149,7 +149,7 @@ if __name__ == '__main__':
         outfileName=infileName.replace(".root","_info.root")
 
     cmd = "xrdcp -f %s %s" % (infileName,outfileName)
-    print cmd
+    print(cmd)
     os.system(cmd)
 
     infoDictFileName = "%sinfo_%i.json" % (infoInputDir,runNumber)
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     infoDict = yaml.safe_load(txtbuffer)
 
-    print 'Processing file:', infileName
+    print('Processing file:', infileName)
     processRun(runNumber,outfileName,infoDict)
 
     # if condorMode:

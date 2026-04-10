@@ -84,14 +84,14 @@ date = datetime.datetime.now()
 # savewaves = int(args.save)
 timeout = float(args.timeout)
 # print savewaves
-print "timeout is ",timeout
+print("timeout is ",timeout)
 
 if runNumber==-1:
 	runNumber=GetNextNumber()
 #### Initial preparation
-print "Next run number: %i"%runNumber
+print("Next run number: %i"%runNumber)
 
-print "\n \nPreparing 8-channel scope. \n"
+print("\n \nPreparing 8-channel scope. \n")
 lecroy.write('STOP')
 lecroy.write("*CLS")
 lecroy.write("COMM_HEADER OFF")
@@ -120,9 +120,9 @@ vOffsets_in_mV.append(int(1000* args.vScale5 * args.vPos5))
 vOffsets_in_mV.append(int(1000* args.vScale6 * args.vPos6))
 vOffsets_in_mV.append(int(1000* args.vScale7 * args.vPos7))
 vOffsets_in_mV.append(int(1000* args.vScale8 * args.vPos8))
-print "Vertical setup."
+print("Vertical setup.")
 for chan in range(1,nchan+1):
-	print "\tChannel %i: %i mV/div, %i mV offset. "% (chan, vScales_in_mV[chan-1],vOffsets_in_mV[chan-1])
+	print("\tChannel %i: %i mV/div, %i mV offset. "% (chan, vScales_in_mV[chan-1],vOffsets_in_mV[chan-1]))
 	lecroy.write("C%i:COUPLING D50"%(chan))
 	lecroy.write("C%i:VOLT_DIV %iMV"%(chan, vScales_in_mV[chan-1]))
 	lecroy.write("C%i:OFFSET %iMV"%(chan, vOffsets_in_mV[chan-1]))
@@ -134,16 +134,16 @@ lecroy.write("BANDWIDTH_LIMIT OFF")
 ####### Horizontal setup ########
 
 time_div_in_ns = int(args.horizontalWindow)/10 ## specify full window as argument
-print "\nTimebase: %i ns/div." % time_div_in_ns
+print("\nTimebase: %i ns/div." % time_div_in_ns)
 if time_div_in_ns != 2 and time_div_in_ns != 5 and time_div_in_ns!=500000 and time_div_in_ns!=1000000:
-	print "Warning: time base must fit predefined set of possible values."
+	print("Warning: time base must fit predefined set of possible values.")
 sample_rate_in_GS = args.sampleRate
 
 lecroy.write("TIME_DIV %iNS"%time_div_in_ns)
-print "\tMake sure sampling rate is set to 10 GS/s manually."
+print("\tMake sure sampling rate is set to 10 GS/s manually.")
 # lecroy.write("TIME_DIV e-9")
 
-print "Setting horizontal offset 50 %i ns" %args.timeoffset
+print("Setting horizontal offset 50 %i ns" %args.timeoffset)
 lecroy.write("TRIG_DELAY %i ns"%args.timeoffset)
 
 
@@ -153,7 +153,7 @@ if args.trigCh != "LINE":
 	lecroy.write("%s:TRLV %0.3fV"%(args.trigCh,args.trig))
 	lecroy.write("TRIG_SLOPE %s" %args.trigSlope)
 
-print "\nTriggering on %s with %0.3fV threshold, %s polarity." %(args.trigCh,args.trig,args.trigSlope)
+print("\nTriggering on %s with %0.3fV threshold, %s polarity." %(args.trigCh,args.trig,args.trigSlope))
 
 #lecroy.write("TRIG_SELECT Edge,SR,LINE")
 #lecroy.write("TRIG_SELECT Edge,SR,EX")
@@ -166,7 +166,7 @@ lecroy.write("STORE_SETUP ALL_DISPLAYED,HDD,AUTO,OFF,FORMAT,BINARY")
 
 nevents = int(args.numEvents)
 ##Sequence configuration
-print "\nTaking %i events in sequence mode."%nevents
+print("\nTaking %i events in sequence mode."%nevents)
 lecroy.write("SEQ ON,%i"%nevents)
 status = ""
 status = "busy"
@@ -178,7 +178,7 @@ run_logf.close()
 start = time.time()
 now = datetime.datetime.now()
 current_time = now.strftime("%H:%M:%S")
-print "\n \n \n  -------------  Starting acquisition for run %i at %s. ---------------"%(runNumber,current_time)
+print("\n \n \n  -------------  Starting acquisition for run %i at %s. ---------------"%(runNumber,current_time))
 #lecroy.write("*TRG")
 #prewait = time.time()
 #lecroy.query(r"""vbs? 'app.waituntilidle(7)' """)
@@ -206,9 +206,9 @@ lecroy.query("ALST?")
 
 end = time.time()
 duration = end-start
-print "\n \n \n  -------------  Acquisition complete.   ------------------------"
-print "\tAcquisition duration: %0.4f s"%duration
-print "\tTrigger rate: %0.1f Hz" %(nevents/duration)
+print("\n \n \n  -------------  Acquisition complete.   ------------------------")
+print("\tAcquisition duration: %0.4f s"%duration)
+print("\tTrigger rate: %0.1f Hz" %(nevents/duration))
 
 # print("Storage configuration:")
 # print(lecroy.query("STORE_SETUP?"))
@@ -241,7 +241,7 @@ lecroy.query("ALST?")
 end = time.time()
 
 
-print("Waveform storage complete. \n\tStoring waveforms took %0.4f s" % (end - start))
+print(("Waveform storage complete. \n\tStoring waveforms took %0.4f s" % (end - start)))
 #time.sleep(0.5)
 
 ## renaming files with automatic numbering scheme.. no lnoger needed.
@@ -262,8 +262,8 @@ print("Waveform storage complete. \n\tStoring waveforms took %0.4f s" % (end - s
 lecroy.close()
 rm.close()
 final = time.time()
-print "\nFinished run %i."%runNumber
-print "Full script duration: %0.f s"%(final-initial)
+print("\nFinished run %i."%runNumber)
+print("Full script duration: %0.f s"%(final-initial))
 tmp_file2 = open(run_log_path,"w")
 status = "ready"
 tmp_file2.write(status)

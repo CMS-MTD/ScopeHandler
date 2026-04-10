@@ -131,5 +131,5 @@ if __name__ == '__main__':
 
     infoDict = yaml.safe_load(txtbuffer)
 
-    print('Processing file:', infileName)
+    print(('Processing file:', infileName))
     processRun(runNumber,outfileName,infoDict)

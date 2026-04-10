@@ -194,8 +194,8 @@ input1 = fast_Keysight_bin(inputFile1,1,n_points) ## to get the number of segmen
 
 n_events = list (input1[1])[0] ## number of events/segments
 n_points = list(input1[2])[0] ## number of points acquired for each event/segment
-print("n_events = ", n_events)
-print("n_points = ", n_points)
+print(("n_events = ", n_events))
+print(("n_points = ", n_points))
 
 ## prepare the output files
 outputFile = '%srun_scope%s.root' % (OutputFilePath, run)
@@ -215,7 +215,7 @@ outTree.Branch('time', time, 'time[1]['+str(n_points)+']/F' )
 if Debug: n_events=1000
 for i in range(n_events):
     if i%1000==0:
-        print("Processing event %i" % i)
+        print(("Processing event %i" % i))
     channel[0] = fast_Keysight_bin(inputFile1, i+1, n_points)[0][1]
     channel[1] = fast_Keysight_bin(inputFile2, i+1, n_points)[0][1]
     channel[2] = fast_Keysight_bin(inputFile3, i+1, n_points)[0][1]
