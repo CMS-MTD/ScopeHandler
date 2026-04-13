@@ -397,5 +397,5 @@ print(("\nFilling tree took %i seconds." %(final-start)))
 print(("\nFull script duration: %0.f s"%(final-initial)))
 
 if CopyToEOS: 
-    os.system("xrdcp -fs %s %s" %(outputFile,eosPath))
+    os.system("xrdcp -fs %s %s/%s" %(outputFile,eosPath, outputFile))
     os.system("rm %s " %(outputFile))
