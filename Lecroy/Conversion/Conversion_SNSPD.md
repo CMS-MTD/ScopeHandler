@@ -17,5 +17,5 @@
  You can run `.q` in the root terminal to exit root
 
  To exit the environment run \
- `conda deactivate root_env`
+ `conda deactivate`
  
